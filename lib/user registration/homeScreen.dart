@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petpal/user%20registration/login.dart';
-import 'package:petpal/user%20registration/services/authentication.dart';
+import 'package:petpal/user%20registration/services/google_auth.dart';
 import 'package:petpal/user%20registration/widget/button.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
             const Text("home"),
             MyButton(
                 onTab: () async {
-                  await AuthServices().signout();
+                  await FirebaseServices().googleSignOut();
                   Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => Login()));
                 },
