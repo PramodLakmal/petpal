@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/Screens/community_chat_screen.dart';
+import 'package:petpal/Screens/community_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
 import 'package:petpal/user%20registration/newpet.dart';
 import 'package:petpal/user%20registration/petprofile.dart';
-import 'package:petpal/user%20registration/social.dart';
 import 'package:petpal/user%20registration/userprofile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,11 +26,12 @@ class _HomescreenState extends State<HomeScreen> {
 
   int selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
+  static final List<Widget> _pages = <Widget>[
     Center(child: Text('Home Page Content', style: TextStyle(fontSize: 24))),
+    CommunityFeedScreen(),
     AddPet(),
-    Social(),
-    UserProfile(),
+    CommunityChatScreen(),
+    UserProfile()
   ];
 
   void _onItemTapped(int index) {
@@ -231,12 +233,17 @@ class _HomescreenState extends State<HomeScreen> {
             label: 'My pets',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add Pet',
+            icon: Icon(Icons.people),
+            label: 'Community',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'meassage',
+            icon: Icon(Icons.add_circle_outline_rounded),
+            label: 'Add Pet',
+          ),
+          
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message), 
+            label: 'Chat'
           ),
           BottomNavigationBarItem(
             icon: Icon(
@@ -244,6 +251,7 @@ class _HomescreenState extends State<HomeScreen> {
             ),
             label: 'Profile',
           ),
+          
         ],
         currentIndex: selectedIndex,
         selectedItemColor: Colors.orangeAccent,
