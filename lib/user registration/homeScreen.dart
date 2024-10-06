@@ -133,39 +133,58 @@ class HomeScreen extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 8.0),
-                      child: Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: AssetImage(
-                                "images/dog_placeholder.png"), // Add pet image if available
-                            radius: 30,
+                      child: Container(
+                        width: double
+                            .infinity, // Set width to fill the available space
+                        height: 200,
+                        // Set a fixed height for the card
+                        child: Card(
+                          color: Colors.amber,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          title: Text(
-                            pet['name'],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                  15), // Round the corners
+                              child: Image.asset(
+                                "images/catpaw.png", // Use a placeholder or actual image
+                                fit: BoxFit
+                                    .cover, // Cover the entire space of the rectangle
+                                width: 60, // Set a width for the image
+                                height: 60, // Set a height for the image
+                              ),
                             ),
+                            title: Text(
+                              pet['name'],
+                              style: const TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Card(
+                                color: Colors.white,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text('"${pet['description']}"')),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PetProfile(
+                                            name: pet['name'],
+                                            breed: pet['breed'],
+                                            age: pet['age'],
+                                            gender: pet['gender'],
+                                            weight: pet['weight'],
+                                            petId: pet.id,
+                                            //  imageUrl: pet['imageUrl'],
+                                          )));
+                            },
                           ),
-                          subtitle: Text('"${pet['description']}"'),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PetProfile(
-                                          name: pet['name'],
-                                          breed: pet['breed'],
-                                          age: pet['age'],
-                                          gender: pet['gender'],
-                                          weight: pet['weight'],
-                                          petId: pet.id,
-                                          //  imageUrl: pet['imageUrl'],
-                                        )));
-                          },
                         ),
                       ),
                     );

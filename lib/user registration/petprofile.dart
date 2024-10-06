@@ -1,7 +1,9 @@
+import 'dart:convert'; // Required for Base64 decoding
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:petpal/user%20registration/editPetProfile.dart';
 import 'package:petpal/user%20registration/homeScreen.dart';
+import 'dart:typed_data'; // Required for handling image data
 
 class PetProfile extends StatefulWidget {
   final String name;
@@ -10,7 +12,6 @@ class PetProfile extends StatefulWidget {
   final String gender;
   final double weight; // Change weight to double
   final String petId; // Add petId to identify the pet
-  // final String imageUrl; // Add imageUrl to hold the pet's image
 
   const PetProfile({
     super.key,
@@ -20,7 +21,6 @@ class PetProfile extends StatefulWidget {
     required this.gender,
     required this.weight, // Accept weight as double
     required this.petId, // Accept petId
-    // required this.imageUrl, // Accept imageUrl
   });
 
   @override
@@ -34,6 +34,8 @@ class _PetProfileState extends State<PetProfile> {
   late String gender;
   late double weight; // Change to double
 
+  Uint8List? petImage; // To store the decoded image
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +45,30 @@ class _PetProfileState extends State<PetProfile> {
     age = widget.age; // Initialize as int
     gender = widget.gender;
     weight = widget.weight; // Initialize as double
+
+    // Fetch pet image when widget is initialized
+    _fetchPetImage();
+  }
+
+  // Function to fetch the pet image from Firestore
+  Future<void> _fetchPetImage() async {
+    try {
+      DocumentSnapshot petDoc = await FirebaseFirestore.instance
+          .collection('pets')
+          .doc(widget.petId)
+          .get();
+
+      if (petDoc.exists) {
+        String? imageBase64 = petDoc['imageBase64']; // Get Base64 image string
+        if (imageBase64 != null && imageBase64.isNotEmpty) {
+          setState(() {
+            petImage = base64Decode(imageBase64); // Decode Base64 string
+          });
+        }
+      }
+    } catch (e) {
+      print('Failed to fetch pet image: $e');
+    }
   }
 
   Future<void> _deletePet() async {
@@ -86,27 +112,34 @@ class _PetProfileState extends State<PetProfile> {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.network(
-                  '', // Use imageUrl passed from constructor
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: petImage != null
+                    ? Image.memory(
+                        petImage!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : const Icon(
+                        Icons.pets, // Display pet icon if image is not fetched
+                        size: 100,
+                        color: Colors.grey,
+                      ), // Show pet icon if image is null
               ),
             ),
             const SizedBox(height: 20),
 
             Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.yellow.shade100, // Light yellow background
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.orangeAccent, width: 2),
-                ),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.yellow.shade100, // Light yellow background
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.orangeAccent, width: 2),
+              ),
 
-                // Pet details
+              // Pet details
 
-                child: Column(children: [
+              child: Column(
+                children: [
                   Text(
                     "$name's About",
                     style: const TextStyle(
@@ -162,7 +195,9 @@ class _PetProfileState extends State<PetProfile> {
                       ),
                     ],
                   ),
-                ])),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 20),
 
