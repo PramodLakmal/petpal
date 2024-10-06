@@ -60,7 +60,7 @@ class _SignUpState extends State<SignUp> {
           SizedBox(
             width: double.infinity,
             height: height / 2.7,
-            child: Image.asset("images/v.png"),
+            child: Image.asset("images/catpaw.png"),
           ),
           TextFieldInput(
               hintText: "name",

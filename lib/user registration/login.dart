@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:petpal/Password%20Forget/forgot_password.dart';
 import 'package:petpal/user%20registration/SignUp.dart';
 import 'package:petpal/user%20registration/homeScreen.dart';
 import 'package:petpal/user%20registration/services/authentication.dart';
+import 'package:petpal/user%20registration/services/google_auth.dart';
 import 'package:petpal/user%20registration/widget/button.dart';
 import 'package:petpal/user%20registration/widget/showSnackbar.dart';
 import 'package:petpal/user%20registration/widget/text_field.dart';
@@ -58,7 +60,7 @@ class _LoginState extends State<Login> {
           SizedBox(
             width: double.infinity,
             height: height / 2.7,
-            child: Image.asset("images/dog.png"),
+            child: Image.asset("images/login.png"),
           ),
           TextFieldInput(
               hintText: "email",
@@ -69,18 +71,36 @@ class _LoginState extends State<Login> {
               icon: Icons.lock,
               textEditingController: passwordController,
               isPass: true),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "Forgot Password?",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
           MyButton(onTab: loginUsers, text: "Login"),
+          const Forgot_password(),
           SizedBox(height: height / 15),
+          Row(
+            children: [
+              Expanded(child: Container(height: 1, color: Colors.black)),
+              const Text("or"),
+              Expanded(child: Container(height: 1, color: Colors.black)),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                onPressed: () async {
+                  await FirebaseServices().signInWithGoogle();
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                },
+                child: Row(
+                  children: [
+                    Image.network(
+                      "https://image.similarpng.com/very-thumbnail/2020/06/Logo-google-icon-PNG.png",
+                      height: 35,
+                    ),
+                    Text("continue With Googel",
+                        style: TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                )),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

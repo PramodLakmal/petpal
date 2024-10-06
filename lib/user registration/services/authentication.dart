@@ -14,10 +14,12 @@ class AuthServices {
         UserCredential credential = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
+            print(credential.user!.uid);
+
         await _firebaseFirestore
             .collection("users")
             .doc(credential.user!.uid)
-            .set({"name": name, "email": email, "uid": credential.user!.uid});
+            .set({"name": name, "email": email, "uid": credential.user!.uid, "isAdmin": false, "isUser": true});
         res = "Success";
       }
     } catch (e) {
@@ -31,9 +33,20 @@ class AuthServices {
     String res = "Some error Occured";
     try {
       if (email.isNotEmpty || password.isNotEmpty) {
-        await _auth.signInWithEmailAndPassword(
+       UserCredential cred= await _auth.signInWithEmailAndPassword(
             email: email, password: password);
-        res = "Success";
+
+            DocumentSnapshot userSnapshot = await _firebaseFirestore.collection("users").doc(cred.user!.uid).get();
+
+       bool isAdmin = userSnapshot['isAdmin'] ?? false;     
+      if (isAdmin) {
+        // Redirect to admin dashboard
+        res = "admin";
+      } else {
+        // Redirect to regular user home screen
+        res = "user";
+      }
+      
       } else {
         res = "please enter all the field";
       }
