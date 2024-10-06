@@ -1,7 +1,9 @@
-// add_pet.dart
+import 'dart:io'; // Required to handle files
+import 'dart:convert'; // Required for Base64 encoding
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // For picking images
 import 'package:petpal/user%20registration/homeScreen.dart';
 
 class AddPet extends StatefulWidget {
@@ -24,6 +26,32 @@ class _AddPetState extends State<AddPet> {
   // Gender dropdown value
   String _gender = 'Male'; // Default value
 
+  // Image picker
+  final ImagePicker _picker = ImagePicker();
+  File? _pickedImage; // File to store the picked image
+
+  // Function to pick an image
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path); // Store the picked image
+      });
+    }
+  }
+
+  // Function to convert image to Base64 string
+  Future<String?> _convertImageToBase64() async {
+    if (_pickedImage == null) return null;
+    try {
+      List<int> imageBytes = await _pickedImage!.readAsBytes();
+      return base64Encode(imageBytes);
+    } catch (e) {
+      print('Error encoding image: $e');
+      return null;
+    }
+  }
+
   // Function to add pet data to Firestore
   Future<void> _addPet() async {
     if (_formKey.currentState!.validate()) {
@@ -37,27 +65,25 @@ class _AddPetState extends State<AddPet> {
           return;
         }
 
-        // Add pet data to Firestore
+        // Convert image to Base64
+        final imageBase64 = await _convertImageToBase64();
+
+        // Add pet data to Firestore, including the Base64 image
         DocumentReference docRef =
             await FirebaseFirestore.instance.collection('pets').add({
           'name': _nameController.text.trim(),
           'age': int.parse(_ageController.text.trim()), // Convert to int
           'breed': _breedController.text.trim(),
-          'gender': _gender, // Use selected gender
+          'gender': _gender,
           'weight':
               double.parse(_weightController.text.trim()), // Convert to double
           'description': _descriptionController.text.trim(),
           'userId': user.uid,
-          // Optional: Add a unique pet ID
+          'imageBase64': imageBase64, // Store Base64-encoded image
           'timestamp': FieldValue.serverTimestamp(), // Optional: Add timestamp
         });
 
-        // Update the document with the generated pet ID
-        await docRef.update({
-          'petId': docRef.id,
-        });
-
-        // Clear the form fields after adding pet data to Firestore
+        // Clear form fields after adding pet data
         _nameController.clear();
         _ageController.clear();
         _breedController.clear();
@@ -119,22 +145,23 @@ class _AddPetState extends State<AddPet> {
                 child: CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey[200],
-                  child: IconButton(
-                    icon: const Icon(Icons.add_a_photo,
-                        color: Colors.orangeAccent),
-                    onPressed: () {
-                      // Handle add photo functionality
-                      // You can integrate image picker here
-                    },
-                  ),
+                  backgroundImage: _pickedImage != null
+                      ? FileImage(_pickedImage!)
+                      : null, // Display the picked image
+                  child: _pickedImage == null
+                      ? IconButton(
+                          icon: const Icon(Icons.add_a_photo,
+                              color: Colors.orangeAccent),
+                          onPressed:
+                              _pickImage, // Handle add photo functionality
+                        )
+                      : null,
                 ),
               ),
               const SizedBox(height: 10),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle add photo button functionality
-                  },
+                  onPressed: _pickImage, // Pick image on button press
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orangeAccent,
                     shape: RoundedRectangleBorder(
@@ -233,8 +260,7 @@ class _AddPetState extends State<AddPet> {
                                 value: _gender,
                                 onChanged: (newValue) {
                                   setState(() {
-                                    _gender =
-                                        newValue!; // Update selected gender
+                                    _gender = newValue!;
                                   });
                                 },
                                 items: <String>[
@@ -246,35 +272,28 @@ class _AddPetState extends State<AddPet> {
                                     child: Text(value),
                                   );
                                 }).toList(),
-                                validator: (value) {
-                                  if (value == null) {
-                                    return 'Please select the pet\'s gender';
-                                  }
-                                  return null;
-                                },
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 15),
+                        const SizedBox(width: 20),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Weight:'),
+                              const Text('Weight (kg):'),
                               TextFormField(
                                 controller: _weightController,
                                 decoration: const InputDecoration(
-                                  hintText: 'Weight (in kg)',
+                                  hintText: 'Enter weight',
                                 ),
-                                keyboardType: TextInputType.numberWithOptions(
-                                    decimal: true),
+                                keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Please enter the pet\'s weight';
                                   }
                                   if (double.tryParse(value.trim()) == null) {
-                                    return 'Please enter a valid number';
+                                    return 'Please enter a valid weight';
                                   }
                                   return null;
                                 },
@@ -289,16 +308,12 @@ class _AddPetState extends State<AddPet> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _addPet,
-                // Attach the _addPet function
+                onPressed: _addPet, // Trigger add pet function
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                child: const Text('Register'),
+                child: const Text('Add Pet'),
               ),
             ],
           ),
