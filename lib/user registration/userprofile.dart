@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../Screens/newsfeed/news_feed_screen.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -185,6 +186,59 @@ class _UserProfileState extends State<UserProfile> {
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 20),
+
+                // News Feed Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to NewsFeedScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>  NewsFeedScreen()),
+                      );
+                    },
+                    child: Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      color: Colors.orangeAccent,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'Explore News Feed',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  'Browse lost and found pets in your community',
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ],
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
                 // My pet section
                 Container(
                   padding: const EdgeInsets.all(16.0),
