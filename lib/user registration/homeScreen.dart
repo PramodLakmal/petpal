@@ -30,7 +30,7 @@ class _HomescreenState extends State<HomeScreen> {
     Center(child: Text('Home Page Content', style: TextStyle(fontSize: 24))),
     CommunityFeedScreen(),
     AddPet(),
-    CommunityChatScreen(),
+    UserSelectionScreen(),
     UserProfile()
   ];
 
