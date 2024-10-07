@@ -56,18 +56,6 @@ class _HomescreenState extends State<HomeScreen> {
                       letterSpacing: 1.2),
                 ),
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.red),
-                  onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                    );
-                  }, // Call the logout function
-                ),
-              ],
             )
           : null,
       body: selectedIndex == 0

@@ -1,6 +1,8 @@
 import 'dart:convert'; // Required for Base64 decoding
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/Screens/completedvaccines.dart';
+import 'package:petpal/Screens/upcomingVaccines.dart';
 import 'package:petpal/user%20registration/editPetProfile.dart';
 import 'package:petpal/user%20registration/homeScreen.dart';
 import 'dart:typed_data'; // Required for handling image data
@@ -213,7 +215,14 @@ class _PetProfileState extends State<PetProfile> {
             ),
             const SizedBox(height: 10),
             ElevatedButton.icon(
-              onPressed: () {}, // Add functionality here
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpcomingVaccines(petId: widget.petId),
+                  ),
+                );
+              }, // Add functionality here
               icon: const Icon(Icons.vaccines),
               label: const Text("Upcoming Vaccine"),
               style: ElevatedButton.styleFrom(
@@ -223,7 +232,14 @@ class _PetProfileState extends State<PetProfile> {
             ),
             const SizedBox(height: 10),
             ElevatedButton.icon(
-              onPressed: () {}, // Add functionality here
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Completed(petId: widget.petId),
+                  ),
+                );
+              }, // Add functionality here
               icon: const Icon(Icons.history),
               label: const Text("Vaccination History"),
               style: ElevatedButton.styleFrom(
