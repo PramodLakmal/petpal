@@ -68,9 +68,16 @@ class _AddPetState extends State<AddPet> {
         // Convert image to Base64
         final imageBase64 = await _convertImageToBase64();
 
-        // Add pet data to Firestore, including the Base64 image
+        // Generate a new document reference with a unique ID
         DocumentReference docRef =
-            await FirebaseFirestore.instance.collection('pets').add({
+            FirebaseFirestore.instance.collection('pets').doc();
+
+        // Use the generated document ID as petId
+        String petId = docRef.id;
+
+        // Add pet data to Firestore, including the petId and Base64 image
+        await docRef.set({
+          'petId': petId, // Include petId in the document
           'name': _nameController.text.trim(),
           'age': int.parse(_ageController.text.trim()), // Convert to int
           'breed': _breedController.text.trim(),
@@ -89,13 +96,18 @@ class _AddPetState extends State<AddPet> {
         _breedController.clear();
         _weightController.clear();
         _descriptionController.clear();
+        setState(() {
+          _pickedImage = null; // Clear the picked image
+        });
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Pet added successfully!')),
         );
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+
+        // Navigate back to HomeScreen
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
       } catch (e) {
         // Log the error for debugging
         print('Error adding pet: $e');
