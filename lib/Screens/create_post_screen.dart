@@ -15,6 +15,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? user;
+  DocumentSnapshot? userDoc;
+  String username = "";
+
+  @override
+  void initState() {
+    super.initState();
+    user = _auth.currentUser;
+    _initializeUserDoc();
+  }
+
+  Future<void> _initializeUserDoc() async {
+    userDoc = await _firestore.collection('users').doc(user?.uid).get();
+    setState(() {
+      username = userDoc?['name'] ?? "";
+    });
+  }
 
   List<XFile>? _imageFiles = [];
   String postContent = "";
@@ -43,6 +60,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     await _firestore.collection('posts').add({
       'content': postContent,
       'userId': user?.uid,
+      'username': username,
       'images': imageUrls,
       'likes': 0,
       'comments': [],
