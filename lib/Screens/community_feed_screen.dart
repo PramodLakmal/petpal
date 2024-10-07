@@ -75,7 +75,11 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Community Feed', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Community Feed',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold)),
             Icon(Icons.notifications_none, color: Colors.black),
           ],
         ),
@@ -89,14 +93,14 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
               background: _buildHeader(),
             ),
           ),
-          SliverToBoxAdapter(
-            child: _buildFilterButton(),
-          ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 return StreamBuilder<QuerySnapshot>(
-                  stream: _firestore.collection('posts').orderBy('timestamp', descending: true).snapshots(),
+                  stream: _firestore
+                      .collection('posts')
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
@@ -108,19 +112,37 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
 
                     final posts = snapshot.data!.docs;
 
-                    // Ensure the index is valid before accessing the posts list
                     if (index >= posts.length) {
-                      return SizedBox.shrink(); // Return an empty widget if the index is out of range
+                      return SizedBox.shrink(); // Empty widget if index out of range
                     }
 
                     final post = posts[index];
 
-                    // Return the PostCard with dynamic data for each post
-                    return _buildPostItem(context, post);
+                    // Fetch post uploader's name
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: _firestore
+                          .collection('users')
+                          .doc(post['userId'])
+                          .get(),
+                      builder: (context, userSnapshot) {
+                        if (userSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+
+                        if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                          return Center(child: Text('User data unavailable'));
+                        }
+
+                        final userName = userSnapshot.data!['name'] ?? 'User';
+
+                        return _buildPostItem(context, post, userName);
+                      },
+                    );
                   },
                 );
               },
-              childCount: 1000, // A large number, adjust based on your needs
+              childCount: 1000, // Adjust based on your needs
             ),
           ),
         ],
@@ -128,7 +150,8 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
     );
   }
 
-  Widget _buildPostItem(BuildContext context, DocumentSnapshot post) {
+  Widget _buildPostItem(
+      BuildContext context, DocumentSnapshot post, String userName) {
     final postId = post.id;
     final content = post['content'] ?? 'No content available';
     final images = List<String>.from(post['images'] ?? []);
@@ -141,6 +164,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
       images: images,
       likes: likes,
       comments: comments,
+      userName: userName, // Pass the userName to PostCard widget
     );
   }
 
@@ -155,7 +179,8 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
               image: DecorationImage(
-                image: NetworkImage('https://th.bing.com/th/id/R.86bebc8ceb313545207c639be56f0651?rik=JOO9Wnj8b0GWTA&riu=http%3a%2f%2fpngimg.com%2fuploads%2fdog%2fdog_PNG50380.png&ehk=othL9M41KKnxNrXWUSnkAmjsQ%2fiWbfeqyhCdWFCEDIQ%3d&risl=1&pid=ImgRaw&r=0'),
+                image: NetworkImage(
+                    'https://th.bing.com/th/id/R.86bebc8ceb313545207c639be56f0651?rik=JOO9Wnj8b0GWTA&riu=http%3a%2f%2fpngimg.com%2fuploads%2fdog%2fdog_PNG50380.png&ehk=othL9M41KKnxNrXWUSnkAmjsQ%2fiWbfeqyhCdWFCEDIQ%3d&risl=1&pid=ImgRaw&r=0'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -181,7 +206,8 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -215,37 +241,15 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
       ),
     );
   }
-
-  Widget _buildFilterButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-      child: Row(
-        children: [
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.filter_list),
-            label: Text('Filter'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[300],
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: Size(30, 30),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final String postId;
   final String content;
   final List<String> images;
   final int likes;
   final List<String> comments;
+  final String userName;
 
   PostCard({
     required this.postId,
@@ -253,102 +257,223 @@ class PostCard extends StatelessWidget {
     required this.images,
     required this.likes,
     required this.comments,
+    required this.userName,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+  _PostCardState createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool isLiked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfLiked();
+  }
+
+  void checkIfLiked() async {
+    final userId = _auth.currentUser?.uid;
+    final likesDoc = await _firestore
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('likes')
+        .doc(userId)
+        .get();
+
+    setState(() {
+      isLiked = likesDoc.exists;
+    });
+  }
+
+  void toggleLike() async {
+    final userId = _auth.currentUser?.uid;
+    final postRef = _firestore.collection('posts').doc(widget.postId);
+
+    if (isLiked) {
+      await postRef.collection('likes').doc(userId).delete();
+      postRef.update({'likes': FieldValue.increment(-1)});
+    } else {
+      await postRef.collection('likes').doc(userId).set({});
+      postRef.update({'likes': FieldValue.increment(1)});
+    }
+
+    setState(() {
+      isLiked = !isLiked;
+    });
+  }
+
+  void addComment(String commentText) async {
+    final userId = _auth.currentUser?.uid;
+    final comment = {
+      'userId': userId,
+      'comment': commentText,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    await _firestore
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('comments')
+        .add(comment);
+  }
+
+ @override
+Widget build(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(2.0), // Add padding around the card
+    child: Card(
+      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Padding( // Add padding inside the card
+        padding: const EdgeInsets.all(10.0), 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage('https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain'),
-                  radius: 20.0,
-                ),
-                SizedBox(width: 8.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('User', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Golden Retriever • Mobile', style: TextStyle(color: Colors.grey)),
-                  ],
-                ),
-                Spacer(),
-                IconButton(
-                  icon: Icon(Icons.more_vert),
-                  onPressed: () {
-                    // Handle post options
-                  },
-                ),
-              ],
+            ListTile(
+              leading: CircleAvatar(
+                child: Icon(Icons.person),
+              ),
+              title: Text(widget.userName, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             ),
-            SizedBox(height: 12.0),
-            Text(content, style: TextStyle(fontSize: 16.0)),
-            SizedBox(height: 12.0),
-            if (images.isNotEmpty)
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                  childAspectRatio: 1.0,
-                ),
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.network(images[index], fit: BoxFit.cover),
-                  );
-                },
+            SizedBox(height: 10.0),
+            Text(widget.content, style: TextStyle(fontSize: 18.0)),
+            SizedBox(height: 10.0),
+            if (widget.images.isNotEmpty)
+              Column(
+                children: widget.images
+                    .map((imageUrl) => Image.network(imageUrl))
+                    .toList(),
               ),
             SizedBox(height: 12.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.thumb_up, color: Colors.orangeAccent),
-                      onPressed: () {
-                        // Handle like
-                      },
-                    ),
-                    Text('$likes'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.comment, color: Colors.black),
-                      onPressed: () {
-                        // Handle comments
-                      },
-                    ),
-                    Text('Comments (${comments.length})'),
-                  ],
-                ),
                 IconButton(
-                  icon: Icon(Icons.share, color: Colors.black),
+                  icon: Icon(
+                    isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                    color: isLiked ? Colors.orange : null,
+                  ),
+                  onPressed: toggleLike,
+                ),
+                Text('${widget.likes} Likes', style: TextStyle(color: isLiked ? Colors.orange : null)),
+                SizedBox(width: 16.0),
+                IconButton(
+                  icon: Icon(Icons.comment),
                   onPressed: () {
-                    // Handle share
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return CommentSection(postId: widget.postId);
+                        });
                   },
                 ),
+                Text('${widget.comments.length} Comments'), // Display comment count
               ],
             ),
           ],
         ),
       ),
+    ),
+  );
+}
+
+}
+
+class CommentSection extends StatefulWidget {
+  final String postId;
+
+  CommentSection({required this.postId});
+
+  @override
+  _CommentSectionState createState() => _CommentSectionState();
+}
+
+class _CommentSectionState extends State<CommentSection> {
+  final TextEditingController _commentController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  void postComment() async {
+    if (_commentController.text.isEmpty) return;
+
+    await _firestore
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('comments')
+        .add({
+      'text': _commentController.text,
+      'userId': FirebaseAuth.instance.currentUser?.uid,
+      'timestamp': FieldValue.serverTimestamp(),
+      
+    });
+
+    _commentController.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: _firestore
+                .collection('posts')
+                .doc(widget.postId)
+                .collection('comments')
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(child: Text('No comments yet.'));
+              }
+
+              final comments = snapshot.data!.docs;
+
+              return ListView.builder(
+                itemCount: comments.length,
+                itemBuilder: (context, index) {
+                  final comment = comments[index];
+                  return ListTile(
+                    title: Text(comment['text'] ?? 'No text'),
+                    subtitle: FutureBuilder<DocumentSnapshot>(
+                      future: _firestore.collection('users').doc(comment['userId']).get(),
+                      builder: (context, userSnapshot) {
+                        if (userSnapshot.connectionState == ConnectionState.waiting) {
+                          return Text('Loading...');
+                        }
+                        if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                          return Text('User not found');
+                        }
+                        final userName = userSnapshot.data!['name'] ?? 'User';
+                        return Text('User: $userName');
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _commentController,
+                  decoration: InputDecoration(hintText: 'Enter your comment'),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.send),
+                onPressed: postComment,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
