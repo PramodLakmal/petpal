@@ -1,10 +1,9 @@
-import 'dart:math';
-
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:petpal/user%20registration/SignUp.dart';
-import 'package:petpal/user%20registration/login.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -14,9 +13,6 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-
   Future<DocumentSnapshot> _getUserDetails() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -25,51 +21,94 @@ class _UserProfileState extends State<UserProfile> {
     return FirebaseFirestore.instance.collection('users').doc(user.uid).get();
   }
 
-  Future<void> _updateUserDetails(String phone, String address) async {
+  Stream<QuerySnapshot> _getUserPosts() {
     User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception("User is not logged in");
-    }
-
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-      'phone': phone,
-      'address': address,
-    });
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .where('userId', isEqualTo: user!.uid)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 
-  Future<void> _deleteUser() async {
+  Stream<QuerySnapshot> _getUserPets() {
     User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      throw Exception("User is not logged in");
-    }
-
-    // Delete pets associated with the user
-    var petsSnapshot = await FirebaseFirestore.instance
+    return FirebaseFirestore.instance
         .collection('pets')
-        .where('userId', isEqualTo: user.uid)
-        .get();
+        .where('userId', isEqualTo: user!.uid)
+        .snapshots();
+  }
 
-    for (var pet in petsSnapshot.docs) {
-      await pet.reference.delete();
+  // Upload profile photo
+  Future<void> _uploadProfilePhoto() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile == null) return;
+
+      File file = File(pickedFile.path);
+
+      // Upload to Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('users/${user.uid}/profile_photo.jpg');
+      await storageRef.putFile(file);
+
+      // Get download URL
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'profilePhotoUrl': downloadUrl});
+    } catch (e) {
+      print('Error uploading profile photo: $e');
     }
+  }
 
-    // Delete user from the 'users' collection
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+  // Upload cover photo
+  Future<void> _uploadCoverPhoto() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
 
-    // Optionally, delete the user account from Firebase Auth
-    await user.delete();
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => SignUp())); // Adjust as needed
+      if (pickedFile == null) return;
+
+      File file = File(pickedFile.path);
+
+      // Upload to Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('users/${user.uid}/cover_photo.jpg');
+      await storageRef.putFile(file);
+
+      // Get download URL
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'coverPhotoUrl': downloadUrl});
+    } catch (e) {
+      print('Error uploading cover photo: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Profile'),
-        backgroundColor: Colors.blue,
+        title: const Text('Profile'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: _getUserDetails(),
@@ -84,134 +123,164 @@ class _UserProfileState extends State<UserProfile> {
 
           var userDetails = snapshot.data!.data() as Map<String, dynamic>;
 
-          // Set initial values for phone and address fields
-          _phoneController.text = userDetails['phone'] ?? '';
-          _addressController.text = userDetails['address'] ?? '';
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
+          return SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  'User Information',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                // Top user cover photo + profile section
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Background Cover Photo
+                    GestureDetector(
+                      onTap: _uploadCoverPhoto,
+                      child: Image.network(
+                        userDetails['coverPhotoUrl'] ??
+                            'https://via.placeholder.com/150',
+                        width: double.infinity,
+                        height: 180,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      left: 16,
+                      bottom: -40,
+                      child: GestureDetector(
+                        onTap: _uploadProfilePhoto,
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(
+                            userDetails['profilePhotoUrl'] ??
+                                'https://via.placeholder.com/80',
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -25,
+                      right: 16,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Add button logic for follow/unfollow
+                        },
+                        child: const Text('Follow', style: TextStyle(color: Colors.orange)),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 50),
+                // User info
                 Text(
-                  'Name: ${userDetails['name'] ?? 'N/A'}',
-                  style: const TextStyle(fontSize: 18),
+                  userDetails['name'] ?? 'User Name',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Email: ${userDetails['email'] ?? 'N/A'}',
-                  style: const TextStyle(fontSize: 18),
+                  '${userDetails['followers'] ?? 0} Followers | ${userDetails['following'] ?? 0} Following',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  userDetails['bio'] ?? 'No bio available',
+                  style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 20),
+                // My pet section
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  width: double.infinity,
+                  color: Colors.grey[200],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'My pet',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      StreamBuilder<QuerySnapshot>(
+                        stream: _getUserPets(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const CircularProgressIndicator();
+                          }
 
-                // Editable card for phone and address
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            labelText: 'Phone',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _addressController,
-                          decoration: const InputDecoration(
-                            labelText: 'Address',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () async {
-                            String updatedPhone = _phoneController.text.trim();
-                            String updatedAddress =
-                                _addressController.text.trim();
+                          var pets = snapshot.data!.docs;
 
-                            // Update user details in Firestore
-                            await _updateUserDetails(
-                                updatedPhone, updatedAddress);
+                          if (pets.isEmpty) {
+                            return const Text("No pets found.");
+                          }
 
-                            // Show a confirmation message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Profile updated successfully!')),
-                            );
-                          },
-                          child: const Text('Update Profile'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Delete button
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final confirmation = await showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Confirm Deletion'),
-                            content: const Text(
-                                'Are you sure you want to delete your account? This action cannot be undone.'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text('Delete'),
-                              ),
-                            ],
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: pets.length,
+                            itemBuilder: (context, index) {
+                              var pet = pets[index].data() as Map<String, dynamic>;
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      pet['petPhotoUrl'] ??
+                                          'https://via.placeholder.com/80'),
+                                ),
+                                title: Text(pet['name']),
+                                subtitle: Text(pet['breed']),
+                              );
+                            },
                           );
                         },
-                      );
-
-                      if (confirmation == true) {
-                        await _deleteUser();
-                        Navigator.of(context)
-                            .pushReplacementNamed('/login'); // Adjust as needed
-                      }
-                    },
-                    child: const Text('Delete Account'),
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      ),
+                    ],
                   ),
                 ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
-                    },
-                    child: const Text('Logout'),
+                const SizedBox(height: 20),
+                // Posts section
+                DefaultTabController(
+                  length: 4,
+                  child: Column(
+                    children: [
+                      TabBar(
+                        indicatorColor: Colors.orange,
+                        labelColor: Colors.orange,
+                        tabs: const [
+                          Tab(text: 'Posts'),
+                          Tab(text: 'Groups'),
+                          Tab(text: 'Events'),
+                          Tab(text: 'Photos'),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 400,
+                        child: TabBarView(
+                          children: [
+                            // Posts section
+                            StreamBuilder<QuerySnapshot>(
+                              stream: _getUserPosts(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const CircularProgressIndicator();
+                                }
+
+                                var posts = snapshot.data!.docs;
+
+                                if (posts.isEmpty) {
+                                  return const Text("No posts found.");
+                                }
+
+                                return ListView.builder(
+                                  itemCount: posts.length,
+                                  itemBuilder: (context, index) {
+                                    var post = posts[index].data() as Map<String, dynamic>;
+                                    return PostWidget(postData: post);
+                                  },
+                                );
+                              },
+                            ),
+                            const Center(child: Text('Groups section')),
+                            const Center(child: Text('Events section')),
+                            const Center(child: Text('Photos section')),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -221,11 +290,55 @@ class _UserProfileState extends State<UserProfile> {
       ),
     );
   }
+}
+
+class PostWidget extends StatelessWidget {
+  final Map<String, dynamic> postData;
+
+  const PostWidget({required this.postData, Key? key}) : super(key: key);
 
   @override
-  void dispose() {
-    _phoneController.dispose();
-    _addressController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            leading: CircleAvatar(
+              child: Icon(Icons.person),
+            ),
+            title: Text(postData['username'] ?? 'Unknown'),
+          ),
+          const SizedBox(height: 8),
+          Text(postData['content'] ?? 'No content'),
+          const SizedBox(height: 8),
+          if (postData['images'] != null && postData['images'].isNotEmpty)
+            Column(
+              children: List<Widget>.from(
+                postData['images'].map<Widget>((imageUrl) {
+                  return Image.network(imageUrl);
+                }),
+              ),
+            ),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.thumb_up_alt_outlined),
+                onPressed: () {},
+              ),
+              Text('${postData['likes'] ?? 0} Likes'),
+              IconButton(
+                icon: const Icon(Icons.comment),
+                onPressed: () {
+                  // Handle comment press
+                },
+              ),
+              Text('${postData['comments']?.length ?? 0} Comments'),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

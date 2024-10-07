@@ -151,22 +151,40 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
   }
 
   Widget _buildPostItem(
-      BuildContext context, DocumentSnapshot post, String userName) {
-    final postId = post.id;
-    final content = post['content'] ?? 'No content available';
-    final images = List<String>.from(post['images'] ?? []);
-    final likes = post['likes'] ?? 0;
-    final comments = List<String>.from(post['comments'] ?? []);
+    BuildContext context, DocumentSnapshot post, String userName) {
+  final postId = post.id;
+  final content = post['content'] ?? 'No content available';
+  final images = List<String>.from(post['images'] ?? []);
+  final likes = post['likes'] ?? 0;
+  final comments = List<String>.from(post['comments'] ?? []);
 
-    return PostCard(
-      postId: postId,
-      content: content,
-      images: images,
-      likes: likes,
-      comments: comments,
-      userName: userName, // Pass the userName to PostCard widget
-    );
-  }
+  return FutureBuilder<DocumentSnapshot>(
+    future: _firestore.collection('users').doc(post['userId']).get(),
+    builder: (context, userSnapshot) {
+      if (userSnapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+        return Center(child: Text('User data unavailable'));
+      }
+
+      final userData = userSnapshot.data!;
+      final userProfilePicture = userData['profilePhotoUrl'] ?? '';
+
+      return PostCard(
+        postId: postId,
+        content: content,
+        images: images,
+        likes: likes,
+        comments: comments,
+        userName: userName,
+        userProfilePicture: userProfilePicture, // Pass profile picture to PostCard
+      );
+    },
+  );
+}
+
 
   Widget _buildHeader() {
     return Padding(
@@ -250,6 +268,7 @@ class PostCard extends StatefulWidget {
   final int likes;
   final List<String> comments;
   final String userName;
+  final String userProfilePicture;
 
   PostCard({
     required this.postId,
@@ -257,7 +276,8 @@ class PostCard extends StatefulWidget {
     required this.images,
     required this.likes,
     required this.comments,
-    required this.userName,
+    required this.userName, 
+    required this.userProfilePicture,
   });
 
   @override
@@ -334,8 +354,12 @@ Widget build(BuildContext context) {
           children: [
             ListTile(
               leading: CircleAvatar(
-                child: Icon(Icons.person),
-              ),
+                  radius: 20.0,
+                  backgroundImage: widget.userProfilePicture.isNotEmpty
+                      ? NetworkImage(widget.userProfilePicture)
+                      : AssetImage('images/catpaw.png') // Fallback to a placeholder image
+                          as ImageProvider,      
+                ),
               title: Text(widget.userName, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 10.0),
