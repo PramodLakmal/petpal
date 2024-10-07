@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/admin%20side/adminScreens/Usermanagement.dart';
 import 'package:petpal/admin%20side/admin_login.dart';
 
 
@@ -34,6 +35,8 @@ class AdminDashboard extends StatelessWidget {
                           icon: Icons.people,
                           color: Colors.blueAccent,
                           onPressed: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => Usermanagement())); // Adjust as needed
                            
                           },
                         ),

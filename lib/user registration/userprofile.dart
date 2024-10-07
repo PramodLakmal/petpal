@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/user%20registration/SignUp.dart';
+import 'package:petpal/user%20registration/login.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -55,6 +59,9 @@ class _UserProfileState extends State<UserProfile> {
 
     // Optionally, delete the user account from Firebase Auth
     await user.delete();
+
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => SignUp())); // Adjust as needed
   }
 
   @override
@@ -186,11 +193,25 @@ class _UserProfileState extends State<UserProfile> {
 
                       if (confirmation == true) {
                         await _deleteUser();
-                        Navigator.of(context).pushReplacementNamed('/login'); // Adjust as needed
+                        Navigator.of(context)
+                            .pushReplacementNamed('/login'); // Adjust as needed
                       }
                     },
                     child: const Text('Delete Account'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  ),
+                ),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login()),
+                      );
+                    },
+                    child: const Text('Logout'),
                   ),
                 ),
               ],
