@@ -254,7 +254,7 @@ class _HomescreenState extends State<HomeScreen> {
           
         ],
         currentIndex: selectedIndex,
-        selectedItemColor: Colors.orangeAccent,
+        selectedItemColor: Colors.orange,
         selectedLabelStyle:
             const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
