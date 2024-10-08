@@ -68,18 +68,30 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.white,
         elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Community Feed',
-                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-            Icon(Icons.notifications_none, color: Colors.white),
-          ],
+        centerTitle: true,
+        title: Text(
+          'Community Feed',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+      actions: [
+          IconButton(
+            icon: Icon(
+              Icons.notifications_none,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              // Handle notifications icon tap here
+            },
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
