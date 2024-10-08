@@ -89,91 +89,98 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
 
         return Scaffold(
           body: SafeArea(
-            child: NestedScrollView(
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
-                return <Widget>[
-                  SliverAppBar(
-                    backgroundColor: Colors.orangeAccent,
-                    expandedHeight: 300,
-                    floating: false,
-                    pinned: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      title: Text(
-                          '${reportData['animalType']} (${reportData['breed']})'),
-                      background: Image.network(
-                        reportData['imageUrl'],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    actions: [
-                      if (isOwner)
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportScreen(doc: widget.doc),
+            child: Column(
+              children: [
+                Expanded(
+                  child: NestedScrollView(
+                    headerSliverBuilder:
+                        (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverAppBar(
+                          backgroundColor: Colors.orangeAccent,
+                          expandedHeight: 300,
+                          floating: false,
+                          pinned: true,
+                          flexibleSpace: FlexibleSpaceBar(
+                            title: Text(
+                                '${reportData['animalType']} (${reportData['breed']})'),
+                            background: Image.network(
+                              reportData['imageUrl'],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          actions: [
+                            if (isOwner)
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EditReportScreen(doc: widget.doc),
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
+                          ],
                         ),
-                    ],
-                  ),
-                ];
-              },
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      ];
+                    },
+                    body: SingleChildScrollView(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildInfoCard(reportData),
-                          SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween, // Adds space between the two widgets
-                            children: [
-                              // Like button with count on the left
-                              Row(
-                                children: [
-                                  _buildLikeSection(), // Your like button with count
-                                ],
-                              ),
-                              // Solved button on the right (if the user is the owner)
-                              if (isOwner)
-                                ElevatedButton(
-                                  child: Text(
-                                      isSolved ? 'Solved' : 'Mark as Solved'),
-                                  onPressed: isSolved ? null : _markAsSolved,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        isSolved ? Colors.grey : Colors.green,
-                                  ),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildInfoCard(reportData),
+                                SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        _buildLikeSection(),
+                                      ],
+                                    ),
+                                    if (isOwner)
+                                      ElevatedButton(
+                                        child: Text(isSolved
+                                            ? 'Solved'
+                                            : 'Mark as Solved'),
+                                        onPressed:
+                                            isSolved ? null : _markAsSolved,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: isSolved
+                                              ? Colors.grey
+                                              : Colors.green,
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                            ],
+                                SizedBox(height: 24),
+                                Text(
+                                  'Comments',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.amber[800]),
+                                ),
+                                SizedBox(height: 8),
+                                _buildCommentSection(),
+                              ],
+                            ),
                           ),
-                          SizedBox(height: 24),
-                          Text(
-                            'Comments',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.amber[800]),
-                          ),
-                          SizedBox(height: 8),
-                          _buildCommentSection(),
                         ],
                       ),
                     ),
-                    _buildCommentInput(),
-                  ],
+                  ),
                 ),
-              ),
+                _buildCommentInput(),
+              ],
             ),
           ),
         );
@@ -424,7 +431,7 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: Offset(0, -3),
           ),
         ],
       ),
