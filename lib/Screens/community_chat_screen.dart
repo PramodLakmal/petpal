@@ -91,7 +91,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
               stream: _firestore.collection('users').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator(color: Colors.orange,));
                 }
 
                 final users = snapshot.data!.docs;
@@ -115,7 +115,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                     final userId = users[index].id;
                     final userName = user['name'] ?? 'Unknown User';
                     final userAvatar = user['profilePhotoUrl'] ??
-                        'https://cdn-icons-png.flaticon.com/512/5404/5404433.png';
+                        'https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png';
 
                     return GestureDetector(
                       onTap: () {
@@ -163,7 +163,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator(color: Colors.orange,));
                 }
 
                 final chats = snapshot.data!.docs;
@@ -199,7 +199,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                     final lastMessage = chatData['lastMessage'] ?? '';
                     final timestamp = chatData['timestamp'] as Timestamp?;
                     final userAvatar = chatData['receiverProfilePhotoUrl'] ??
-                        'https://cdn-icons-png.flaticon.com/512/5404/5404433.png';
+                        'https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png';
                     final userName = chatData['receiverName'] ?? 'Unknown User'; // Get the receiver name
 
                     // Fallback to the other user's ID if the name is not available
