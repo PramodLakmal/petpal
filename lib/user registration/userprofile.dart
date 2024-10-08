@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../Screens/newsfeed/news_feed_screen.dart';
 
 import 'package:petpal/user%20registration/login.dart';
 
