@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:petpal/Screens/adoption/adoption.dart';
+import 'package:petpal/Screens/appointment/doctor_search_page.dart';
 import 'package:petpal/Screens/community_chat_screen.dart';
 import 'package:petpal/Screens/community_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
@@ -97,7 +98,14 @@ class _HomescreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         _buildCategoryItem(Icons.event_note, "Notices"),
-                        _buildCategoryItem(Icons.schedule, "Schedule"), // New Schedule option
+                        _buildCategoryItem(Icons.schedule, "Appointment", onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DoctorSearchPage(), // Navigate to AdoptionPage
+                            ),
+                          );
+                        }), // Navigate to DoctorSearchPage
                         _buildCategoryItem(Icons.pets, "Adoption", onTap: () {
                           Navigator.push(
                             context,
