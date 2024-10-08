@@ -248,26 +248,6 @@ class _PetProfileState extends State<PetProfile> {
                   minimumSize: const Size(double.infinity, 50),
                 ),
               ),
-              
-              const SizedBox(height: 10), // Adjust spacing here
-
-              // "Adoption" Button
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AdoptionPage()),
-                );
-
-                }, // Add functionality here
-                icon: const Icon(Icons.pets),
-                label: const Text("Adoption"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-              ),
             ],
           ),
         ),

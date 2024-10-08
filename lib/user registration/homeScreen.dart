@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/Screens/adoption/adoption.dart';
 import 'package:petpal/Screens/community_chat_screen.dart';
 import 'package:petpal/Screens/community_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
@@ -97,7 +98,14 @@ class _HomescreenState extends State<HomeScreen> {
                       children: [
                         _buildCategoryItem(Icons.event_note, "Notices"),
                         _buildCategoryItem(Icons.schedule, "Schedule"), // New Schedule option
-                        _buildCategoryItem(Icons.pets, "Adoption"),
+                        _buildCategoryItem(Icons.pets, "Adoption", onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdoptionPage(), // Navigate to AdoptionPage
+                            ),
+                          );
+                        }),
                         _buildCategoryItem(Icons.shopping_cart, "Pet Market"),
                         _buildCategoryItem(Icons.miscellaneous_services, "Services"),
                       ],
@@ -229,6 +237,7 @@ class _HomescreenState extends State<HomeScreen> {
                                                   weight: pet['weight'],
                                                   petId: pet.id,
                                                 )));
+
                                   },
                                 ),
                               ),
@@ -281,25 +290,28 @@ class _HomescreenState extends State<HomeScreen> {
     );
   }
 
-  // Helper function to build a category item
-  Widget _buildCategoryItem(IconData iconData, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: const Color.fromARGB(255, 255, 171, 64), // Updated color for icons
-            child: Icon(iconData, color: Colors.white),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
+  // Helper function to build a category item with tap support
+  Widget _buildCategoryItem(IconData iconData, String label, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: const Color.fromARGB(255, 255, 171, 64), // Updated color for icons
+              child: Icon(iconData, color: Colors.white),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
