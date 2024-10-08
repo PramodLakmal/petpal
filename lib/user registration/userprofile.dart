@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:petpal/Screens/edit_profile_screen.dart';
 import 'dart:io';
 import '../Screens/newsfeed/news_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
@@ -106,10 +107,13 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   // Function to edit profile
-  Future<void> _editProfile() async {
-    // Implement the logic for editing the user's profile here
-    print('Edit Profile pressed');
-  }
+  // Function to edit profile
+Future<void> _editProfile() async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => EditProfileScreen()),
+  );
+}
 
   // Function to delete profile
   Future<void> _deleteProfile() async {
