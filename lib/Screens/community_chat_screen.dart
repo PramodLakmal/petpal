@@ -46,12 +46,6 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Go back action
-          },
-        ),
         actions: [
           IconButton(
             icon: Icon(Icons.add, color: Colors.black),
@@ -68,14 +62,15 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
             padding: const EdgeInsets.all(12.0),
             child: TextField(
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
-                hintText: 'Search a Friend',
+                prefixIcon: Icon(Icons.search, color: Colors.black),
+                hintText: '                    Search a Friend',
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(20.0),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey[200],
+                fillColor: const Color.fromARGB(255, 241, 240, 239),
               ),
               onChanged: (value) {
                 // Implement search functionality if needed
@@ -83,10 +78,12 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
             ),
           ),
 
+          SizedBox(height: 10),
+
           // Horizontal avatars at the top
           Container(
             height: 90,
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: StreamBuilder<QuerySnapshot>(
               stream: _firestore.collection('users').snapshots(),
               builder: (context, snapshot) {
@@ -103,6 +100,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: users.length,
+                  itemExtent: 70.0,
                   itemBuilder: (context, index) {
                     final user = users[index].data() as Map<String, dynamic>?;
 
@@ -150,6 +148,8 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
             ),
           ),
 
+          SizedBox(height: 10),
+
           // List of chat contacts (showing last message and timestamp)
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -188,9 +188,9 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                     // Attempt to fetch the other user's information
                     final lastMessage = chatData['lastMessage'] ?? '';
                     final timestamp = chatData['timestamp'] as Timestamp?;
-                    final userAvatar = chatData['senderProfilePhotoUrl'] ??
+                    final userAvatar = chatData['receiverProfilePhotoUrl'] ??
                         'https://cdn-icons-png.flaticon.com/512/5404/5404433.png';
-                    final userName = chatData['senderName'] ?? 'Unknown User'; // Get the receiver name
+                    final userName = chatData['receiverName'] ?? 'Unknown User'; // Get the receiver name
 
                     // Fallback to the other user's ID if the name is not available
                     if (otherUserId != null) {
