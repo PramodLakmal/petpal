@@ -1,6 +1,7 @@
 import 'dart:convert'; // Required for Base64 decoding
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/Screens/adoption/adoption.dart';
 import 'package:petpal/Screens/completedvaccines.dart';
 import 'package:petpal/Screens/upcomingVaccines.dart';
 import 'package:petpal/user%20registration/editPetProfile.dart';
@@ -105,149 +106,170 @@ class _PetProfileState extends State<PetProfile> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Pet image
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: petImage != null
-                    ? Image.memory(
-                        petImage!,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      )
-                    : const Icon(
-                        Icons.pets, // Display pet icon if image is not fetched
-                        size: 100,
-                        color: Colors.grey,
-                      ), // Show pet icon if image is null
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Pet image
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: petImage != null
+                      ? Image.memory(
+                          petImage!,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : const Icon(
+                          Icons.pets, // Display pet icon if image is not fetched
+                          size: 100,
+                          color: Colors.grey,
+                        ), // Show pet icon if image is null
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade100, // Light yellow background
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.orangeAccent, width: 2),
-              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.yellow.shade100, // Light yellow background
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.orangeAccent, width: 2),
+                ),
 
-              // Pet details
+                // Pet details
+                child: Column(
+                  children: [
+                    Text(
+                      "$name's About",
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    buildPetDetailRow("Name", name),
+                    buildPetDetailRow("Breed", breed),
+                    buildPetDetailRow(
+                        "Age", age.toString()), // Convert age to string
+                    buildPetDetailRow("Gender", gender),
+                    buildPetDetailRow("Weight", "${weight.toString()} kg"),
+                    const SizedBox(height: 20),
 
-              child: Column(
-                children: [
-                  Text(
-                    "$name's About",
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  buildPetDetailRow("Name", name),
-                  buildPetDetailRow("Breed", breed),
-                  buildPetDetailRow(
-                      "Age", age.toString()), // Convert age to string
-                  buildPetDetailRow("Gender", gender),
-                  buildPetDetailRow("Weight", "${weight.toString()} kg"),
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () async {
-                          final updatedData = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditPet(
-                                name: name,
-                                breed: breed,
-                                age: age.toString(), // Pass age as string
-                                gender: gender,
-                                weight:
-                                    weight.toString(), // Pass weight as string
-                                petId: widget.petId, // Pass the petId here
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            final updatedData = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditPet(
+                                  name: name,
+                                  breed: breed,
+                                  age: age.toString(), // Pass age as string
+                                  gender: gender,
+                                  weight: weight
+                                      .toString(), // Pass weight as string
+                                  petId: widget.petId, // Pass the petId here
+                                ),
                               ),
-                            ),
-                          );
+                            );
 
-                          // Check if updated data is not null
-                          if (updatedData != null) {
-                            // Update the state with the new data
-                            setState(() {
-                              name = updatedData['name'];
-                              breed = updatedData['breed'];
-                              age = int.parse(
-                                  updatedData['age']); // Parse back to int
-                              gender = updatedData['gender'];
-                              weight = double.parse(updatedData[
-                                  'weight']); // Parse back to double
-                            });
-                          }
-                        },
-                        icon: const Icon(Icons.edit),
-                      ),
-                      IconButton(
-                        onPressed: _deletePet,
-                        icon: const Icon(Icons.delete),
-                      ),
-                    ],
-                  ),
-                ],
+                            // Check if updated data is not null
+                            if (updatedData != null) {
+                              // Update the state with the new data
+                              setState(() {
+                                name = updatedData['name'];
+                                breed = updatedData['breed'];
+                                age = int.parse(
+                                    updatedData['age']); // Parse back to int
+                                gender = updatedData['gender'];
+                                weight = double.parse(updatedData[
+                                    'weight']); // Parse back to double
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.edit),
+                        ),
+                        IconButton(
+                          onPressed: _deletePet,
+                          icon: const Icon(Icons.delete),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Buttons for additional options
-            ElevatedButton.icon(
-              onPressed: () {}, // Add functionality here
-              icon: const Icon(Icons.calendar_today),
-              label: const Text("Appointments"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orangeAccent,
-                minimumSize: const Size(double.infinity, 50),
+              // Buttons for additional options
+              ElevatedButton.icon(
+                onPressed: () {}, // Add functionality here
+                icon: const Icon(Icons.calendar_today),
+                label: const Text("Appointments"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UpcomingVaccines(petId: widget.petId),
-                  ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UpcomingVaccines(petId: widget.petId),
+                    ),
+                  );
+                }, // Add functionality here
+                icon: const Icon(Icons.vaccines),
+                label: const Text("Upcoming Vaccine"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Completed(petId: widget.petId),
+                    ),
+                  );
+                }, // Add functionality here
+                icon: const Icon(Icons.history),
+                label: const Text("Vaccination History"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+              
+              const SizedBox(height: 10), // Adjust spacing here
+
+              // "Adoption" Button
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdoptionPage()),
                 );
-              }, // Add functionality here
-              icon: const Icon(Icons.vaccines),
-              label: const Text("Upcoming Vaccine"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orangeAccent,
-                minimumSize: const Size(double.infinity, 50),
+
+                }, // Add functionality here
+                icon: const Icon(Icons.pets),
+                label: const Text("Adoption"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Completed(petId: widget.petId),
-                  ),
-                );
-              }, // Add functionality here
-              icon: const Icon(Icons.history),
-              label: const Text("Vaccination History"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orangeAccent,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
