@@ -75,6 +75,37 @@ class _HomescreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 20),
 
+                // "Category" Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "Category",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+
+                // Horizontal Category Scroll Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildCategoryItem(Icons.event_note, "Notices"),
+                        _buildCategoryItem(Icons.schedule, "Schedule"), // New Schedule option
+                        _buildCategoryItem(Icons.pets, "Adoption"),
+                        _buildCategoryItem(Icons.shopping_cart, "Pet Market"),
+                        _buildCategoryItem(Icons.miscellaneous_services, "Services"),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
                 // "My Pets" Section with Title and Paw Icon
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -197,7 +228,6 @@ class _HomescreenState extends State<HomeScreen> {
                                                   gender: pet['gender'],
                                                   weight: pet['weight'],
                                                   petId: pet.id,
-                                                  //  imageUrl: pet['imageUrl'],
                                                 )));
                                   },
                                 ),
@@ -216,9 +246,9 @@ class _HomescreenState extends State<HomeScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.pets,
+              Icons.home,
             ),
-            label: 'My pets',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
@@ -228,7 +258,6 @@ class _HomescreenState extends State<HomeScreen> {
             icon: Icon(Icons.add_circle_outline_rounded),
             label: 'Add Pet',
           ),
-          
           BottomNavigationBarItem(
             icon: Icon(Icons.message), 
             label: 'Chat'
@@ -239,7 +268,6 @@ class _HomescreenState extends State<HomeScreen> {
             ),
             label: 'Profile',
           ),
-          
         ],
         currentIndex: selectedIndex,
         selectedItemColor: Colors.orange,
@@ -249,6 +277,29 @@ class _HomescreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         elevation: 12,
+      ),
+    );
+  }
+
+  // Helper function to build a category item
+  Widget _buildCategoryItem(IconData iconData, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 25,
+            backgroundColor: const Color.fromARGB(255, 255, 171, 64), // Updated color for icons
+            child: Icon(iconData, color: Colors.white),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
