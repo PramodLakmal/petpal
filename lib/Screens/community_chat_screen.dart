@@ -14,6 +14,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
 
   String? _currentUserId;
   String? _currentUserName;
+  String _searchQuery = ''; // Store search query
 
   @override
   void initState() {
@@ -63,7 +64,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
             child: TextField(
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search, color: Colors.black),
-                hintText: '                    Search a Friend',
+                hintText: 'Search a Friend',
                 hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
@@ -73,7 +74,9 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                 fillColor: const Color.fromARGB(255, 241, 240, 239),
               ),
               onChanged: (value) {
-                // Implement search functionality if needed
+                setState(() {
+                  _searchQuery = value.toLowerCase(); // Update the search query
+                });
               },
             ),
           ),
@@ -150,7 +153,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
 
           SizedBox(height: 10),
 
-          // List of chat contacts (showing last message and timestamp)
+          // List of chat contacts (showing last message and timestamp) with sliding delete functionality
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _firestore
@@ -169,13 +172,20 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                   return Center(child: Text('No chats available'));
                 }
 
+                // Filter chats based on the search query
+                final filteredChats = chats.where((chat) {
+                  final chatData = chat.data() as Map<String, dynamic>?;
+                  final userName = chatData?['receiverName'] ?? '';
+                  return userName.toLowerCase().contains(_searchQuery);
+                }).toList();
+
                 return ListView.builder(
-                  itemCount: chats.length,
+                  itemCount: filteredChats.length,
                   itemBuilder: (context, index) {
-                    final chatData = chats[index].data() as Map<String, dynamic>?;
+                    final chatData = filteredChats[index].data() as Map<String, dynamic>?;
 
                     if (chatData == null) {
-                      print('Chat data is null for document: ${chats[index].id}');
+                      print('Chat data is null for document: ${filteredChats[index].id}');
                       return Container();
                     }
 
@@ -194,31 +204,72 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
 
                     // Fallback to the other user's ID if the name is not available
                     if (otherUserId != null) {
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(userAvatar),
+                      return Dismissible(
+                        key: Key(filteredChats[index].id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: Icon(Icons.delete, color: Colors.white),
                         ),
-                        title: Text(userName),
-                        subtitle: Text(lastMessage),
-                        trailing: Text(
-                          timestamp != null ? _formatTimestamp(timestamp) : '',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
-                        onTap: () {
-                          // Navigate to chat screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatScreen(
-                                selectedUserId: otherUserId,
-                                selectedUserName: userName, // Use the receiver name
-                              ),
-                            ),
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm Delete'),
+                                content: Text('Are you sure you want to delete this chat?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false); // Cancel the deletion
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true); // Confirm the deletion
+                                    },
+                                    child: Text('Delete'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
+                        onDismissed: (direction) async {
+                          await _firestore.collection('chats').doc(filteredChats[index].id).delete();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Chat deleted')),
+                          );
+                        },
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(userAvatar),
+                          ),
+                          title: Text(userName),
+                          subtitle: Text(lastMessage),
+                          trailing: Text(
+                            timestamp != null ? _formatTimestamp(timestamp) : '',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                          onTap: () {
+                            // Navigate to chat screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                  selectedUserId: otherUserId,
+                                  selectedUserName: userName, // Use the receiver name
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     } else {
                       print("Error: Couldn't find the other user in this chat.");
