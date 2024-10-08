@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'edit_report_screen.dart';
 
 class PetReportDetailScreen extends StatefulWidget {
   final DocumentSnapshot doc;
@@ -62,63 +63,100 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
     });
   }
 
+  Future<void> _markAsSolved() async {
+    await FirebaseFirestore.instance
+        .collection('pet_reports')
+        .doc(widget.doc.id)
+        .update({'status': 'solved'});
+  }
+
   @override
   Widget build(BuildContext context) {
-    var reportData = widget.doc.data() as Map<String, dynamic>;
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('pet_reports')
+          .doc(widget.doc.id)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
+        var reportData = snapshot.data!.data() as Map<String, dynamic>;
+        bool isOwner =
+            FirebaseAuth.instance.currentUser?.uid == reportData['userId'];
+        bool isSolved = reportData['status'] == 'solved';
+
+        return Scaffold(
+          body: SafeArea(
+            child: NestedScrollView(
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
                   SliverAppBar(
+                    backgroundColor: Colors.orangeAccent,
                     expandedHeight: 300,
                     floating: false,
                     pinned: true,
-                    backgroundColor: Colors.amber, // Subtle amber accent
                     flexibleSpace: FlexibleSpaceBar(
                       title: Text(
-                        '${reportData['animalType']} (${reportData['breed']})',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(color: Colors.black54, blurRadius: 2)
-                          ],
-                        ),
-                      ),
-                      background: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image.network(
-                            reportData['imageUrl'],
-                            fit: BoxFit.cover,
-                          ),
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, Colors.black54],
-                              ),
-                            ),
-                          ),
-                        ],
+                          '${reportData['animalType']} (${reportData['breed']})'),
+                      background: Image.network(
+                        reportData['imageUrl'],
+                        fit: BoxFit.cover,
                       ),
                     ),
+                    actions: [
+                      if (isOwner)
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditReportScreen(doc: widget.doc),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
                   ),
-                  SliverToBoxAdapter(
-                    child: Padding(
+                ];
+              },
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildInfoCard(reportData),
                           SizedBox(height: 16),
-                          _buildLikeSection(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .spaceBetween, // Adds space between the two widgets
+                            children: [
+                              // Like button with count on the left
+                              Row(
+                                children: [
+                                  _buildLikeSection(), // Your like button with count
+                                ],
+                              ),
+                              // Solved button on the right (if the user is the owner)
+                              if (isOwner)
+                                ElevatedButton(
+                                  child: Text(
+                                      isSolved ? 'Solved' : 'Mark as Solved'),
+                                  onPressed: isSolved ? null : _markAsSolved,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        isSolved ? Colors.grey : Colors.green,
+                                  ),
+                                ),
+                            ],
+                          ),
                           SizedBox(height: 24),
                           Text(
                             'Comments',
@@ -132,90 +170,89 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
                         ],
                       ),
                     ),
-                  ),
-                ],
+                    _buildCommentInput(),
+                  ],
+                ),
               ),
             ),
-            _buildCommentInput(),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoCard(Map<String, dynamic> reportData) {
+    String timeAgo = timeago.format(reportData['timestamp'].toDate());
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.location_on, color: Colors.redAccent),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    reportData['location'],
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.pets, color: Colors.brown),
+                SizedBox(width: 8),
+                Text(
+                  'Color: ${reportData['color']}',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.access_time, color: Colors.orangeAccent),
+                SizedBox(width: 8),
+                Text(
+                  'Posted: $timeAgo',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.person, color: Colors.blueAccent),
+                SizedBox(width: 8),
+                Text(
+                  'Reported by: ${reportData['name']}',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.phone, color: Colors.greenAccent),
+                SizedBox(width: 8),
+                Text(
+                  'Contact: ${reportData['contactNumber']}',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
-  
-Widget _buildInfoCard(Map<String, dynamic> reportData) {
-  String timeAgo = timeago.format(reportData['timestamp'].toDate());
-
-  return Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.location_on, color: Colors.redAccent),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  reportData['location'],
-                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(Icons.pets, color: Colors.brown),
-              SizedBox(width: 8),
-              Text(
-                'Color: ${reportData['color']}',
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(Icons.access_time, color: Colors.orangeAccent),
-              SizedBox(width: 8),
-              Text(
-                'Posted: $timeAgo',
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(Icons.person, color: Colors.blueAccent),
-              SizedBox(width: 8),
-              Text(
-                'Reported by: ${reportData['name']}',
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.phone, color: Colors.greenAccent),
-              SizedBox(width: 8),
-              Text(
-                'Contact: ${reportData['contactNumber']}',
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
 
   Widget _buildLikeSection() {
     return StreamBuilder<DocumentSnapshot>(
