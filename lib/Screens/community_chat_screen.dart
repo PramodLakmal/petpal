@@ -188,9 +188,9 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                     // Attempt to fetch the other user's information
                     final lastMessage = chatData['lastMessage'] ?? '';
                     final timestamp = chatData['timestamp'] as Timestamp?;
-                    final userAvatar = chatData['senderProfilePhotoUrl'] ??
+                    final userAvatar = chatData['receiverProfilePhotoUrl'] ??
                         'https://cdn-icons-png.flaticon.com/512/5404/5404433.png';
-                    final userName = chatData['senderName'] ?? 'Unknown User'; // Get the receiver name
+                    final userName = chatData['receiverName'] ?? 'Unknown User'; // Get the receiver name
 
                     // Fallback to the other user's ID if the name is not available
                     if (otherUserId != null) {
