@@ -70,17 +70,14 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.orangeAccent,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Community Feed',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold)),
-            Icon(Icons.notifications_none, color: Colors.black),
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+            Icon(Icons.notifications_none, color: Colors.white),
           ],
         ),
       ),
@@ -88,7 +85,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 200.0,
+            expandedHeight: 180.0,
             flexibleSpace: FlexibleSpaceBar(
               background: _buildHeader(),
             ),
@@ -205,7 +202,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
           ),
           Container(
             width: double.infinity,
-            height: 170,
+            height: 150,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
               color: Colors.black.withOpacity(0.1),
@@ -219,7 +216,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
               child: TextField(
                 decoration: InputDecoration(
                   hintText: "How do you create your post?",
-                  hintStyle: TextStyle(color: Colors.black, fontSize: 18),
+                  hintStyle: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -237,7 +234,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
           ),
           Positioned(
             right: 25,
-            bottom: 50,
+            bottom: 25,
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(

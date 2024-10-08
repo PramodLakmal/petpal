@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../Screens/newsfeed/news_feed_screen.dart';
 
+import 'package:petpal/user%20registration/login.dart';
+
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
 
@@ -103,13 +105,90 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
+  // Function to edit profile
+  Future<void> _editProfile() async {
+    // Implement the logic for editing the user's profile here
+    print('Edit Profile pressed');
+  }
+
+  // Function to delete profile
+  Future<void> _deleteProfile() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      // Delete user data from Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+
+      // Delete user authentication account
+      await user.delete();
+
+      // Navigate to the login screen or a suitable page
+      Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Login()),
+                    );
+    } catch (e) {
+      print('Error deleting profile: $e');
+    }
+  }
+
+  // Logout function
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Login()),
+                    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: Colors.transparent,
+        title: const Text('Pet Owner Profile', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.orangeAccent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.white),
+            onPressed: _editProfile, // Edit profile functionality
+            tooltip: 'Edit Profile',
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.white),
+            onPressed: () async {
+              // Show confirmation dialog before deleting the profile
+              bool? confirmDelete = await showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete Profile', style: TextStyle(color: Colors.orange)),
+                  content: const Text('Are you sure you want to delete your profile?'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                      onPressed: () => Navigator.of(context).pop(false),
+                    ),
+                    TextButton(
+                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      onPressed: () => Navigator.of(context).pop(true),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmDelete == true) {
+                _deleteProfile(); // Delete profile functionality
+              }
+            },
+            tooltip: 'Delete Profile',
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: _logout, // Logout functionality
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: _getUserDetails(),
@@ -136,8 +215,7 @@ class _UserProfileState extends State<UserProfile> {
                     GestureDetector(
                       onTap: _uploadCoverPhoto,
                       child: Image.network(
-                        userDetails['coverPhotoUrl'] ??
-                            'https://via.placeholder.com/150',
+                        userDetails['coverPhotoUrl'] ?? 'https://via.placeholder.com/150',
                         width: double.infinity,
                         height: 180,
                         fit: BoxFit.cover,
@@ -149,10 +227,9 @@ class _UserProfileState extends State<UserProfile> {
                       child: GestureDetector(
                         onTap: _uploadProfilePhoto,
                         child: CircleAvatar(
-                          radius: 40,
+                          radius: 60,
                           backgroundImage: NetworkImage(
-                            userDetails['profilePhotoUrl'] ??
-                                'https://via.placeholder.com/80',
+                            userDetails['profilePhotoUrl'] ?? 'https://via.placeholder.com/80',
                           ),
                         ),
                       ),
@@ -272,8 +349,7 @@ class _UserProfileState extends State<UserProfile> {
                               return ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(
-                                      pet['petPhotoUrl'] ??
-                                          'https://via.placeholder.com/80'),
+                                      pet['petPhotoUrl'] ?? 'https://via.placeholder.com/80'),
                                 ),
                                 title: Text(pet['name']),
                                 subtitle: Text(pet['breed']),
@@ -360,7 +436,9 @@ class PostWidget extends StatelessWidget {
         children: [
           ListTile(
             leading: CircleAvatar(
-              child: Icon(Icons.person),
+              child: Icon(postData['profilePhotoUrl'] != null
+                  ? Icons.person
+                  : Icons.person),
             ),
             title: Text(postData['username'] ?? 'Unknown'),
           ),
