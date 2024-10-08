@@ -46,12 +46,6 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Go back action
-          },
-        ),
         actions: [
           IconButton(
             icon: Icon(Icons.add, color: Colors.black),
@@ -68,14 +62,15 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
             padding: const EdgeInsets.all(12.0),
             child: TextField(
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
-                hintText: 'Search a Friend',
+                prefixIcon: Icon(Icons.search, color: Colors.black),
+                hintText: '                    Search a Friend',
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(20.0),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey[200],
+                fillColor: const Color.fromARGB(255, 241, 240, 239),
               ),
               onChanged: (value) {
                 // Implement search functionality if needed
@@ -83,10 +78,12 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
             ),
           ),
 
+          SizedBox(height: 10),
+
           // Horizontal avatars at the top
           Container(
             height: 90,
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: StreamBuilder<QuerySnapshot>(
               stream: _firestore.collection('users').snapshots(),
               builder: (context, snapshot) {
@@ -103,6 +100,7 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: users.length,
+                  itemExtent: 70.0,
                   itemBuilder: (context, index) {
                     final user = users[index].data() as Map<String, dynamic>?;
 
@@ -149,6 +147,8 @@ class _UserSelectionScreenState extends State<UserSelectionScreen> {
               },
             ),
           ),
+
+          SizedBox(height: 10),
 
           // List of chat contacts (showing last message and timestamp)
           Expanded(
