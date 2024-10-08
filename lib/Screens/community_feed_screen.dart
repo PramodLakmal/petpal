@@ -117,7 +117,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return Center(child: CircularProgressIndicator(color: Colors.orange,));
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -141,7 +141,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
                       builder: (context, userSnapshot) {
                         if (userSnapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
+                          return Center(child: CircularProgressIndicator(color: Colors.orange));
                         }
 
                         if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
@@ -176,7 +176,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
     future: _firestore.collection('users').doc(post['userId']).get(),
     builder: (context, userSnapshot) {
       if (userSnapshot.connectionState == ConnectionState.waiting) {
-        return Center(child: CircularProgressIndicator());
+        return Center(child: CircularProgressIndicator(color: Colors.orange,));
       }
 
       if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
@@ -318,9 +318,11 @@ class _PostCardState extends State<PostCard> {
         .doc(userId)
         .get();
 
+     if (mounted) {
     setState(() {
       isLiked = likesDoc.exists;
     });
+  }
   }
 
   void toggleLike() async {
@@ -355,7 +357,7 @@ class _PostCardState extends State<PostCard> {
         .add(comment);
   }
 
- @override
+@override
 Widget build(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(2.0), // Slightly larger padding
@@ -375,7 +377,7 @@ Widget build(BuildContext context) {
                 radius: 24.0, // Slightly larger avatar
                 backgroundImage: widget.userProfilePicture.isNotEmpty
                     ? NetworkImage(widget.userProfilePicture)
-                    : AssetImage('images/catpaw.png') as ImageProvider,
+                    : NetworkImage('https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png') as ImageProvider,
               ),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +387,7 @@ Widget build(BuildContext context) {
                     style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'No bio available',
+                    'Golden Retriever • Fayetteville',
                     style: TextStyle(fontSize: 14.0, color: Colors.grey),
                   ),
                 ],
@@ -397,7 +399,7 @@ Widget build(BuildContext context) {
             if (widget.images.isNotEmpty)
               GridView.count(
                 shrinkWrap: true, // Prevents expanding
-                crossAxisCount: 1, // Display in 2 columns
+                crossAxisCount: 1, // Display in 1 column
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
                 children: widget.images
@@ -410,12 +412,33 @@ Widget build(BuildContext context) {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                IconButton(
-                  icon: Icon(
-                    isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                    color: isLiked ? Colors.orange : Colors.grey, // Slight color change
-                  ),
-                  onPressed: toggleLike,
+                // Replace the existing IconButton for likes with FutureBuilder
+                FutureBuilder<DocumentSnapshot>(
+                  future: _firestore
+                      .collection('posts')
+                      .doc(widget.postId)
+                      .collection('likes')
+                      .doc(_auth.currentUser?.uid)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator(color: Colors.orange);
+                    }
+
+                    if (!snapshot.hasData) {
+                      return Text('Error loading likes');
+                    }
+
+                    final isLiked = snapshot.data!.exists;
+
+                    return IconButton(
+                      icon: Icon(
+                        isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                        color: isLiked ? Colors.orange : Colors.grey,
+                      ),
+                      onPressed: toggleLike, // Your toggle function remains unchanged
+                    );
+                  },
                 ),
                 Text('${widget.likes} Likes', style: TextStyle(color: isLiked ? Colors.orange : Colors.black54)),
                 SizedBox(width: 16.0),
@@ -438,6 +461,7 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
 
 
 }
