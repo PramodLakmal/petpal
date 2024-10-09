@@ -32,13 +32,12 @@ class _VaccinescreenState extends State<Vaccinescreen> {
         await vaccinesCollection.add({
           'petId': widget.petId,
           'vaccineName': _vaccineNameController.text.trim(),
-          'date': _dateController.text
-              .trim(), // Consider using Timestamp or Date object
+          'date': _dateController.text.trim(),
           'time': _timeController.text.trim(),
           'venue': _venueController.text.trim(),
           'description': _descriptionController.text.trim(),
           'timestamp': FieldValue.serverTimestamp(),
-          'status': 'pending', // Optional: Add timestamp
+          'status': 'pending',
         });
 
         // Clear form fields after adding vaccine data
@@ -53,8 +52,8 @@ class _VaccinescreenState extends State<Vaccinescreen> {
           const SnackBar(content: Text('Vaccine added successfully!')),
         );
 
-        // Optionally, navigate back or reset the form
-        Navigator.pop(context); // Navigate back to previous screen
+        // Navigate back to previous screen
+        Navigator.pop(context);
       } catch (e) {
         // Log the error for debugging
         print('Error adding vaccine: $e');
@@ -109,120 +108,172 @@ class _VaccinescreenState extends State<Vaccinescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Vaccine Details'),
-        backgroundColor: Colors.green,
+        title: Center(
+            child: const Text(
+          'Add Vaccine Details',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        )),
+        backgroundColor: Color(0xFFFA6650),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey, // Associate the form key
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch, // Stretch children to fill width
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'Vaccine Information',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      body: Center(
+        child: Container(
+          width: 800, // Set a fixed width for desktop
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey, // Associate the form key
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: const Text(
+                    'Vaccine Information',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              // Vaccine Name
-              TextFormField(
-                controller: _vaccineNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Vaccine Name',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 20),
+                _buildCard(
+                  child: TextFormField(
+                    controller: _vaccineNameController,
+                    decoration: _inputDecoration(
+                        label: 'Vaccine Name', icon: Icons.vaccines),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter the vaccine name';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter the vaccine name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 15),
-              // Date
-              TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(
-                  labelText: 'Date',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: _buildCard(
+                        child: TextFormField(
+                          controller: _dateController,
+                          decoration: _inputDecoration(
+                            label: 'Date',
+                            icon: Icons.calendar_today,
+                          ),
+                          readOnly: true,
+                          onTap: _pickDate,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please select a date';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: _buildCard(
+                        child: TextFormField(
+                          controller: _timeController,
+                          decoration: _inputDecoration(
+                            label: 'Time',
+                            icon: Icons.access_time,
+                          ),
+                          readOnly: true,
+                          onTap: _pickTime,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please select a time';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                readOnly: true,
-                onTap: _pickDate,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please select a date';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 15),
-              // Time
-              TextFormField(
-                controller: _timeController,
-                decoration: const InputDecoration(
-                  labelText: 'Time',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.access_time),
+                const SizedBox(height: 15),
+                _buildCard(
+                  child: TextFormField(
+                    controller: _venueController,
+                    decoration: _inputDecoration(label: 'Venue'),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter the venue';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-                readOnly: true,
-                onTap: _pickTime,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please select a time';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 15),
-              // Venue
-              TextFormField(
-                controller: _venueController,
-                decoration: const InputDecoration(
-                  labelText: 'Venue',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 15),
+                _buildCard(
+                  child: TextFormField(
+                    controller: _descriptionController,
+                    decoration: _inputDecoration(label: 'Description'),
+                    maxLines: 3,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter a description';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter the venue';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 15),
-              // Description
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: _addVaccine,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFFA6650),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'Add Vaccine',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
                 ),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _addVaccine, // Trigger add vaccine function
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                child: const Text('Add Vaccine'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  // Widget to build a card for form fields
+  Widget _buildCard({required Widget child}) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: child,
+      ),
+    );
+  }
+
+  // Input decoration with an icon
+  InputDecoration _inputDecoration({required String label, IconData? icon}) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.black),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFFFA6650), width: 2),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      suffixIcon: icon != null ? Icon(icon, color: Color(0xFFFA6650)) : null,
     );
   }
 }
