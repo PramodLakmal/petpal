@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petpal/Screens/adoption/adoption.dart';
-import 'package:petpal/Screens/appointment/appointment_history_page.dart';
 import 'package:petpal/Screens/completedvaccines.dart';
 import 'package:petpal/Screens/upcomingVaccines.dart';
 import 'package:petpal/user%20registration/editPetProfile.dart';
@@ -244,7 +243,7 @@ class _PetProfileState extends State<PetProfile> {
                 ],
               ),
             ),
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // About Section with modern UI
             Container(
@@ -337,7 +336,7 @@ class _PetProfileState extends State<PetProfile> {
                 ],
               ),
             ),
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Custom buttons for appointments and vaccines
             ListTile(
@@ -382,60 +381,6 @@ class _PetProfileState extends State<PetProfile> {
               },
             ),
           ],
-              // Buttons for additional options
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AppointmentHistoryPage(), // Change to AppointmentHistoryPage
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.calendar_today),
-                label: const Text("Appointments"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UpcomingVaccines(petId: widget.petId),
-                    ),
-                  );
-                }, // Add functionality here
-                icon: const Icon(Icons.vaccines),
-                label: const Text("Upcoming Vaccine"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Completed(petId: widget.petId),
-                    ),
-                  );
-                }, // Add functionality here
-                icon: const Icon(Icons.history),
-                label: const Text("Vaccination History"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
