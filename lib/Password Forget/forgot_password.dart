@@ -17,7 +17,7 @@ class _Forgot_passwordState extends State<Forgot_password> {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 35),
         child: Align(
-          alignment: Alignment.centerRight,
+          alignment: Alignment.centerLeft,
           child: InkWell(
             onTap: () {
               myDialogBox(context);
