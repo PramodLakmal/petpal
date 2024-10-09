@@ -57,11 +57,13 @@ class _SignUpState extends State<SignUp> {
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: height / 20),
           SizedBox(
             width: double.infinity,
-            height: height / 2.7,
+            height: height / 4,
             child: Image.asset("images/catpaw.png"),
           ),
+          SizedBox(height: height / 25),
           TextFieldInput(
               hintText: "name",
               icon: Icons.person,
@@ -75,22 +77,27 @@ class _SignUpState extends State<SignUp> {
               icon: Icons.lock,
               textEditingController: passwordController,
               isPass: true),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "Forgot Password?",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+          SizedBox(height: height / 25),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFFA6650),
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              minimumSize: Size(230.51, 68.1),
             ),
+            onPressed: signUpUser,
+            child: Text("Sign Up",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
-          MyButton(onTab: signUpUser, text: "Sign Up"),
-          SizedBox(height: height / 15),
+          SizedBox(height: height / 25),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Already have an account?"),
+              Text("Already have an account?",
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
               GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -99,10 +106,30 @@ class _SignUpState extends State<SignUp> {
                     );
                   },
                   child: Text(
-                    "Login",
-                    style: TextStyle(color: Colors.blue),
+                    " Login",
+                    style: TextStyle(
+                        color: Color(
+                          0xFFFA6650,
+                        ),
+                        fontWeight: FontWeight.bold),
                   ))
             ],
+          ),
+          const Spacer(),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 20),
+            color: Color(0xFFFA6650),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Text(
+                  "All rights reserved",
+                  style: TextStyle(
+                      color: Colors.black, fontSize: 14, letterSpacing: 1.2),
+                ),
+              ),
+            ), // Coral orange color
           )
         ],
       )),
