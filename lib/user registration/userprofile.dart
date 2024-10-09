@@ -1,10 +1,11 @@
-import 'dart:math';
-
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:petpal/user%20registration/SignUp.dart';
 import 'package:petpal/user%20registration/login.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -16,6 +17,7 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  String? _profileImageUrl;
 
   Future<DocumentSnapshot> _getUserDetails() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -34,7 +36,39 @@ class _UserProfileState extends State<UserProfile> {
     await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
       'phone': phone,
       'address': address,
+      'profilePhoto': _profileImageUrl,
     });
+
+    // Update the text controllers to reflect the new data immediately
+    setState(() {
+      _phoneController.text = phone;
+      _addressController.text = address;
+    });
+  }
+
+  Future<void> _uploadProfilePhoto() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(source: ImageSource.gallery);
+
+    if (photo != null) {
+      File file = File(photo.path);
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference reference =
+          FirebaseStorage.instance.ref().child('profile_photos/$fileName');
+      await reference.putFile(file);
+      String downloadUrl = await reference.getDownloadURL();
+      setState(() {
+        _profileImageUrl = downloadUrl;
+      });
+      // Optionally update Firestore with the new photo URL
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'profilePhoto': _profileImageUrl});
+      }
+    }
   }
 
   Future<void> _deleteUser() async {
@@ -60,8 +94,10 @@ class _UserProfileState extends State<UserProfile> {
     // Optionally, delete the user account from Firebase Auth
     await user.delete();
 
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => SignUp())); // Adjust as needed
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const SignUp())); // Adjust as needed
   }
 
   @override
@@ -83,35 +119,39 @@ class _UserProfileState extends State<UserProfile> {
           }
 
           var userDetails = snapshot.data!.data() as Map<String, dynamic>;
-
-          // Set initial values for phone and address fields
           _phoneController.text = userDetails['phone'] ?? '';
           _addressController.text = userDetails['address'] ?? '';
+          _profileImageUrl = userDetails['profilePhoto'];
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'User Information',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  'Name: ${userDetails['name'] ?? 'N/A'}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Email: ${userDetails['email'] ?? 'N/A'}',
-                  style: const TextStyle(fontSize: 18),
+                Center(
+                  child: GestureDetector(
+                    onTap: _uploadProfilePhoto,
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundImage: _profileImageUrl != null
+                          ? NetworkImage(_profileImageUrl!)
+                          : null,
+                      child: _profileImageUrl == null
+                          ? const Icon(Icons.add_a_photo, size: 50)
+                          : null,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
 
-                // Editable card for phone and address
+                // User Details Card
                 Card(
-                  elevation: 4,
+                  elevation: 6,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -119,52 +159,44 @@ class _UserProfileState extends State<UserProfile> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        TextField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            labelText: 'Phone',
-                            border: OutlineInputBorder(),
-                          ),
+                        _buildUserDetailRow(
+                          icon: Icons.person,
+                          label: 'Name',
+                          value: userDetails['name'] ?? 'N/A',
                         ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _addressController,
-                          decoration: const InputDecoration(
-                            labelText: 'Address',
-                            border: OutlineInputBorder(),
-                          ),
+                        const Divider(),
+                        _buildUserDetailRow(
+                          icon: Icons.email,
+                          label: 'Email',
+                          value: userDetails['email'] ?? 'N/A',
                         ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () async {
-                            String updatedPhone = _phoneController.text.trim();
-                            String updatedAddress =
-                                _addressController.text.trim();
-
-                            // Update user details in Firestore
-                            await _updateUserDetails(
-                                updatedPhone, updatedAddress);
-
-                            // Show a confirmation message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Profile updated successfully!')),
-                            );
-                          },
-                          child: const Text('Update Profile'),
+                        const Divider(),
+                        _buildUserDetailRow(
+                          icon: Icons.phone,
+                          label: 'Phone',
+                          value: _phoneController.text.isNotEmpty
+                              ? _phoneController.text
+                              : 'null',
+                          onEdit: () => _showUpdateDialog('phone'),
+                        ),
+                        const Divider(),
+                        _buildUserDetailRow(
+                          icon: Icons.home,
+                          label: 'Address',
+                          value: _addressController.text.isNotEmpty
+                              ? _addressController.text
+                              : 'null',
+                          onEdit: () => _showUpdateDialog('address'),
                         ),
                       ],
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
 
                 // Delete button
                 Center(
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: () async {
                       final confirmation = await showDialog<bool>(
                         context: context,
@@ -184,7 +216,10 @@ class _UserProfileState extends State<UserProfile> {
                                 onPressed: () {
                                   Navigator.of(context).pop(true);
                                 },
-                                child: const Text('Delete'),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ),
                             ],
                           );
@@ -197,13 +232,20 @@ class _UserProfileState extends State<UserProfile> {
                             .pushReplacementNamed('/login'); // Adjust as needed
                       }
                     },
-                    child: const Text('Delete Account'),
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Delete Account'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      textStyle: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
+                const SizedBox(height: 10),
                 Center(
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
                       Navigator.pushReplacement(
@@ -211,7 +253,15 @@ class _UserProfileState extends State<UserProfile> {
                         MaterialPageRoute(builder: (context) => const Login()),
                       );
                     },
-                    child: const Text('Logout'),
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Logout'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      textStyle: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
@@ -222,10 +272,101 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
+  Widget _buildUserDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    VoidCallback? onEdit,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.blueAccent, size: 28),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+        if (onEdit != null)
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blueAccent),
+            onPressed: onEdit,
+          ),
+      ],
+    );
+  }
+
+  void _showUpdateDialog(String type) {
+    TextEditingController controller =
+        type == 'phone' ? _phoneController : _addressController;
+
+    String title = type.capitalize();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update $title'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(labelText: title),
+            keyboardType: type == 'phone'
+                ? TextInputType.phone
+                : TextInputType.streetAddress,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                String updatedValue = controller.text.trim();
+                if (type == 'phone') {
+                  await _updateUserDetails(
+                      updatedValue, _addressController.text.trim());
+                } else {
+                  await _updateUserDetails(
+                      _phoneController.text.trim(), updatedValue);
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Profile updated successfully!')),
+                );
+                Navigator.of(context).pop();
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _phoneController.dispose();
     _addressController.dispose();
     super.dispose();
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    return this.isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
   }
 }

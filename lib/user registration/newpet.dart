@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart'; // For picking images
 import 'package:petpal/user%20registration/homeScreen.dart';
+import 'package:petpal/user%20registration/login.dart';
 
 class AddPet extends StatefulWidget {
   const AddPet({super.key});
@@ -52,6 +53,12 @@ class _AddPetState extends State<AddPet> {
     }
   }
 
+  // Helper method to capitalize the first letter of the name
+  String _capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text; // Return as is if empty
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
+  }
+
   // Function to add pet data to Firestore
   Future<void> _addPet() async {
     if (_formKey.currentState!.validate()) {
@@ -78,7 +85,8 @@ class _AddPetState extends State<AddPet> {
         // Add pet data to Firestore, including the petId and Base64 image
         await docRef.set({
           'petId': petId, // Include petId in the document
-          'name': _nameController.text.trim(),
+          'name': _capitalizeFirstLetter(
+              _nameController.text.trim()), // Capitalize first letter
           'age': int.parse(_ageController.text.trim()), // Convert to int
           'breed': _breedController.text.trim(),
           'gender': _gender,
@@ -134,14 +142,14 @@ class _AddPetState extends State<AddPet> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register Pet'),
-        backgroundColor: Colors.orangeAccent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back
-          },
-        ),
+        toolbarHeight: 112.0,
+        title: Center(
+            child: const Text(
+          'Register Pet',
+          style: TextStyle(
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        )),
+        backgroundColor: Color(0xFFFA6650),
       ),
       body: SingleChildScrollView(
         // To prevent overflow when keyboard appears
@@ -163,7 +171,7 @@ class _AddPetState extends State<AddPet> {
                   child: _pickedImage == null
                       ? IconButton(
                           icon: const Icon(Icons.add_a_photo,
-                              color: Colors.orangeAccent),
+                              color: Color(0xFFFA6650)),
                           onPressed:
                               _pickImage, // Handle add photo functionality
                         )
@@ -175,12 +183,16 @@ class _AddPetState extends State<AddPet> {
                 child: ElevatedButton(
                   onPressed: _pickImage, // Pick image on button press
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
+                    backgroundColor: Color(0xFFFA6650),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Add Photo'),
+                  child: const Text(
+                    'Add Photo',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               const SizedBox(height: 30),
@@ -193,19 +205,33 @@ class _AddPetState extends State<AddPet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Pet Info',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    Center(
+                      child: const Text(
+                        'Add Your pet',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Name:'),
+                    const Text(
+                      'Name:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter your pet\'s name',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Optional: Rounded corners
+                          borderSide:
+                              BorderSide.none, // Optional: Removes the border
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -215,11 +241,23 @@ class _AddPetState extends State<AddPet> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    const Text('Age:'),
+                    const Text(
+                      'Age:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
                     TextFormField(
                       controller: _ageController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter your pet\'s age',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Optional: Rounded corners
+                          borderSide:
+                              BorderSide.none, // Optional: Removes the border
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -233,11 +271,23 @@ class _AddPetState extends State<AddPet> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    const Text('Breed:'),
+                    const Text(
+                      'Breed:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
                     TextFormField(
                       controller: _breedController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter your pet\'s breed',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Optional: Rounded corners
+                          borderSide:
+                              BorderSide.none, // Optional: Removes the border
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -247,85 +297,109 @@ class _AddPetState extends State<AddPet> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    const Text('Description:'),
-                    TextFormField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your pet\'s description',
+                    const Text(
+                      'Gender:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: _gender,
+                      items: const [
+                        DropdownMenuItem(value: 'Male', child: Text('Male')),
+                        DropdownMenuItem(
+                            value: 'Female', child: Text('Female')),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _gender = value!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Optional: Rounded corners
+                          borderSide:
+                              BorderSide.none, // Optional: Removes the border
+                        ),
                       ),
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      'Weight (in kg):',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      controller: _weightController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your pet\'s weight',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Optional: Rounded corners
+                          borderSide:
+                              BorderSide.none, // Optional: Removes the border
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter the pet\'s description';
+                          return 'Please enter the pet\'s weight';
+                        }
+                        if (double.tryParse(value.trim()) == null) {
+                          return 'Please enter a valid number';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 15),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Gender:'),
-                              DropdownButtonFormField<String>(
-                                value: _gender,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    _gender = newValue!;
-                                  });
-                                },
-                                items: <String>[
-                                  'Male',
-                                  'Female'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
+                    const Text(
+                      'Description:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 3, // Allows multiple lines for description
+                      decoration: InputDecoration(
+                        hintText: 'Enter a brief description of your pet',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Optional: Rounded corners
+                          borderSide:
+                              BorderSide.none, // Optional: Removes the border
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter a description for your pet';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _addPet, // Call function to add pet data
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFFA6650),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Weight (kg):'),
-                              TextFormField(
-                                controller: _weightController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter weight',
-                                ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return 'Please enter the pet\'s weight';
-                                  }
-                                  if (double.tryParse(value.trim()) == null) {
-                                    return 'Please enter a valid weight';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ],
-                          ),
+                        child: const Text(
+                          'Register Pet',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _addPet, // Trigger add pet function
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                child: const Text('Add Pet'),
               ),
             ],
           ),
