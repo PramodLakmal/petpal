@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // For formatting the date
+import 'package:intl/intl.dart';
+import 'package:petpal/Screens/appointment/appointment_details_page%20.dart';
 
 class AppointmentHistoryPage extends StatefulWidget {
   @override
@@ -93,50 +94,114 @@ class _AppointmentHistoryPageState extends State<AppointmentHistoryPage> with Si
     );
   }
 
-  // Method to build individual appointment card
+  // Method to build individual appointment card with image and details button
   Widget _buildAppointmentCard(QueryDocumentSnapshot appointment) {
-    String doctorName = appointment['doctorName'];
+    String doctorId = appointment['doctorId']; // Get doctorId from appointment
     String appointmentTime = appointment['appointmentTime'];
     String petBreed = appointment['petBreed'];
     String payment = appointment['payment'];
     Timestamp appointmentDate = appointment['appointmentDate'];
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Dr. $doctorName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text('Pet: $petBreed'),
-            Text('Appointment Time: $appointmentTime'),
-            Text('Appointment Date: ${formatDate(appointmentDate)}'),
-            Text('Payment: LKR $payment'),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+    // Use FutureBuilder to fetch doctor's photo
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('doctors').doc(doctorId).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(child: CircularProgressIndicator()), // Loading indicator
+            ),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(child: Text('Error fetching doctor data')),
+            ),
+          );
+        }
+
+        // Get doctor's data
+        var doctorData = snapshot.data!.data() as Map<String, dynamic>;
+        String doctorName = doctorData['name'];
+        String doctorPhoto = doctorData['doctorPhoto'];
+
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (appointment['status'] == 'pending')
-                  IconButton(
-                    icon: Icon(Icons.cancel, color: Colors.red),
-                    onPressed: () {
-                      _cancelAppointment(appointment.id);
-                    },
-                  ),
-                if (appointment['status'] == 'pending')
-                  IconButton(
-                    icon: Icon(Icons.done, color: Colors.green),
-                    onPressed: () {
-                      _completeAppointment(appointment.id);
-                    },
-                  ),
+                Row(
+                  children: [
+                    // Display the doctor's image
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(doctorPhoto), // Doctor's image
+                    ),
+                    SizedBox(width: 16),
+                    // Doctor's name and appointment time
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Dr. $doctorName', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
+                        Text('Appointment Time: $appointmentTime'),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Text('Pet: $petBreed'),
+                Text('Appointment Date: ${formatDate(appointmentDate)}'),
+                Text('Payment: LKR $payment'),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Details button to navigate to the appointment details page
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AppointmentDetailsPage(appointment: appointment),
+                          ),
+                        );
+                      },
+                      child: Text('Details'),
+                    ),
+                    // Actions to mark appointment as completed or cancelled
+                    Row(
+                      children: [
+                        if (appointment['status'] == 'pending')
+                          IconButton(
+                            icon: Icon(Icons.cancel, color: Colors.red),
+                            onPressed: () {
+                              _cancelAppointment(appointment.id);
+                            },
+                          ),
+                        if (appointment['status'] == 'pending')
+                          IconButton(
+                            icon: Icon(Icons.done, color: Colors.green),
+                            onPressed: () {
+                              _completeAppointment(appointment.id);
+                            },
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
