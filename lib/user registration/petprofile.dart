@@ -2,6 +2,7 @@ import 'dart:convert'; // Required for Base64 decoding
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:petpal/Screens/adoption/adoption.dart';
+import 'package:petpal/Screens/appointment/appointment_history_page.dart';
 import 'package:petpal/Screens/completedvaccines.dart';
 import 'package:petpal/Screens/upcomingVaccines.dart';
 import 'package:petpal/user%20registration/editPetProfile.dart';
@@ -206,7 +207,14 @@ class _PetProfileState extends State<PetProfile> {
 
               // Buttons for additional options
               ElevatedButton.icon(
-                onPressed: () {}, // Add functionality here
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentHistoryPage(), // Change to AppointmentHistoryPage
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.calendar_today),
                 label: const Text("Appointments"),
                 style: ElevatedButton.styleFrom(
@@ -214,6 +222,7 @@ class _PetProfileState extends State<PetProfile> {
                   minimumSize: const Size(double.infinity, 50),
                 ),
               ),
+
               const SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () {
