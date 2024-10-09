@@ -5,10 +5,14 @@ import 'dart:typed_data'; // For handling byte data
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:petpal/Screens/adoption/adoption.dart';
+import 'package:petpal/Screens/appointment/doctor_search_page.dart';
+import 'package:petpal/Screens/community_chat_screen.dart';
+import 'package:petpal/Screens/community_feed_screen.dart';
+import 'package:petpal/user%20registration/login.dart';
 import 'package:petpal/user%20registration/newpet.dart';
 
 import 'package:petpal/user%20registration/petprofile.dart';
-import 'package:petpal/user%20registration/social.dart';
 import 'package:petpal/user%20registration/userprofile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -83,11 +87,12 @@ class _HomescreenState extends State<HomeScreen> {
 
   int selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
+  static final List<Widget> _pages = <Widget>[
     Center(child: Text('Home Page Content', style: TextStyle(fontSize: 24))),
+    CommunityFeedScreen(),
     AddPet(),
-    Social(),
-    UserProfile(),
+    UserSelectionScreen(),
+    UserProfile()
   ];
 
   void _onItemTapped(int index) {
@@ -153,6 +158,51 @@ class _HomescreenState extends State<HomeScreen> {
                             .cover, // Ensure the image covers the container
                       );
                     },
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // "Category" Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "Category",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+
+                // Horizontal Category Scroll Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildCategoryItem(Icons.event_note, "Notices"),
+                        _buildCategoryItem(Icons.schedule, "Appointment", onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DoctorSearchPage(), // Navigate to AdoptionPage
+                            ),
+                          );
+                        }), // Navigate to DoctorSearchPage
+                        _buildCategoryItem(Icons.pets, "Adoption", onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdoptionPage(), // Navigate to AdoptionPage
+                            ),
+                          );
+                        }),
+                        _buildCategoryItem(Icons.shopping_cart, "Pet Market"),
+                        _buildCategoryItem(Icons.miscellaneous_services, "Services"),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -401,17 +451,21 @@ class _HomescreenState extends State<HomeScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.pets,
+              Icons.home,
             ),
-            label: 'My pets',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.people),
+            label: 'Community',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline_rounded),
             label: 'Add Pet',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Message',
+            icon: Icon(Icons.message), 
+            label: 'Chat'
           ),
           BottomNavigationBarItem(
             icon: Icon(
@@ -421,13 +475,39 @@ class _HomescreenState extends State<HomeScreen> {
           ),
         ],
         currentIndex: selectedIndex,
-        selectedItemColor: Colors.orangeAccent,
+        selectedItemColor: Colors.orange,
         selectedLabelStyle:
             TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         elevation: 12,
+      ),
+    );
+  }
+
+  // Helper function to build a category item with tap support
+  Widget _buildCategoryItem(IconData iconData, String label, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: const Color.fromARGB(255, 255, 171, 64), // Updated color for icons
+              child: Icon(iconData, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
