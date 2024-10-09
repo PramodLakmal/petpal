@@ -349,9 +349,10 @@ class _PetProfileState extends State<PetProfile> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>AppointmentHistoryPage(),
+                    builder: (context) => AppointmentHistoryPage(),
                   ),
-                );              },
+                );
+              },
             ),
             const Divider(),
 
