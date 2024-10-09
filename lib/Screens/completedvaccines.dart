@@ -53,7 +53,7 @@ class _CompletedState extends State<Completed> {
   void _filterVaccines(String query) {
     setState(() {
       searchQuery = query
-          .toLowerCase(); // Convert to lowercase for case insensitive search
+          .toLowerCase(); // Convert to lowercase for case-insensitive search
       filteredVaccines = completedVaccines.where((vaccine) {
         return vaccine['vaccineName']
                 .toLowerCase()
@@ -61,6 +61,140 @@ class _CompletedState extends State<Completed> {
             vaccine['date'].toLowerCase().contains(searchQuery); // Match date
       }).toList();
     });
+  }
+
+  // Function to show a pop-up dialog with vaccine details
+  void _showVaccineDetailsDialog(Map<String, dynamic> vaccine) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Vaccine Name
+                Row(
+                  children: [
+                    const Icon(Icons.vaccines, color: Colors.green, size: 30),
+                    const SizedBox(width: 8),
+                    Text(
+                      vaccine['vaccineName'],
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Date and Time
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today,
+                        color: Colors.blue, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Date: ${vaccine['date']}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time,
+                        color: Colors.orange, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Time: ${vaccine['time'] ?? 'N/A'}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Venue
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.red, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Venue: ${vaccine['venue']}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Description
+                Row(
+                  children: [
+                    const Icon(Icons.description,
+                        color: Colors.purple, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        vaccine['description'] ?? 'No description available',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Close button
+                Align(
+                  alignment: Alignment.center,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color(0xFFFA6650),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        'Close',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -73,7 +207,7 @@ class _CompletedState extends State<Completed> {
           style: TextStyle(
               fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: Color(0xFFFA6650),
+        backgroundColor: const Color(0xFFFA6650),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -116,7 +250,8 @@ class _CompletedState extends State<Completed> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: GestureDetector(
                             onTap: () {
-                              // Optionally, handle tap on the card
+                              _showVaccineDetailsDialog(
+                                  vaccine); // Show pop-up on tap
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -128,7 +263,7 @@ class _CompletedState extends State<Completed> {
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: const Offset(
-                                        0, 3), // changes position of shadow
+                                        0, 3), // Changes position of shadow
                                   ),
                                 ],
                               ),
@@ -139,7 +274,7 @@ class _CompletedState extends State<Completed> {
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
-                                    color: Colors.green,
+                                    color: Color(0xFFFA6650),
                                   ),
                                 ),
                                 subtitle: Text(

@@ -373,6 +373,7 @@ Future<void> _editProfile() async {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
                   //premium membership section
                 Padding(
@@ -578,91 +579,6 @@ class PostWidget extends StatelessWidget {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Failed to delete post')));
     }
-  }
-
-  Widget _buildUserDetailRow({
-    required IconData icon,
-    required String label,
-    required String value,
-    VoidCallback? onEdit,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.blueAccent, size: 28),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-        if (onEdit != null)
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.blueAccent),
-            onPressed: onEdit,
-          ),
-      ],
-    );
-  }
-
-  void _showUpdateDialog(String type) {
-    TextEditingController controller =
-        type == 'phone' ? _phoneController : _addressController;
-
-    String title = type.capitalize();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Update $title'),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(labelText: title),
-            keyboardType: type == 'phone'
-                ? TextInputType.phone
-                : TextInputType.streetAddress,
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                String updatedValue = controller.text.trim();
-                if (type == 'phone') {
-                  await _updateUserDetails(
-                      updatedValue, _addressController.text.trim());
-                } else {
-                  await _updateUserDetails(
-                      _phoneController.text.trim(), updatedValue);
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Profile updated successfully!')),
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Update'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

@@ -242,6 +242,7 @@ class _PetProfileState extends State<PetProfile> {
                   ),
                 ],
               ),
+            ),
               const SizedBox(height: 20),
 
             // About Section with modern UI
@@ -334,7 +335,7 @@ class _PetProfileState extends State<PetProfile> {
                   ),
                 ],
               ),
-
+            ),
               const SizedBox(height: 20),
 
             // Custom buttons for appointments and vaccines

@@ -22,7 +22,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomescreenState();
 }
 
-class _HomescreenState extends State<HomeScreen> {
+class _HomescreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late PageController _pageController; // Declare the PageController
   int _currentPage = 0;
   late Timer _timer;
@@ -37,6 +38,8 @@ class _HomescreenState extends State<HomeScreen> {
     "images/3.jpg" // Second image
     // Third image (You can add more images here)
   ];
+  late AnimationController _animationController; // Controller for animation
+  late Animation<double> _animation; // Animation variable for rotation
 
   @override
   void initState() {
@@ -44,6 +47,20 @@ class _HomescreenState extends State<HomeScreen> {
     _pageController =
         PageController(initialPage: 0); // Initialize the PageController
     _startImageCarousel();
+
+    // Initialize animation controller
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true); // Repeat the animation
+
+    // Create a tween for the rotation animation
+    _animation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.linear,
+      ),
+    );
   }
 
   @override
@@ -51,6 +68,7 @@ class _HomescreenState extends State<HomeScreen> {
     _pageController.dispose(); // Dispose of the PageController
     _timer.cancel(); // Cancel the timer to avoid memory leaks
     _searchController.dispose(); // Dispose of the search controller
+    _animationController.dispose(); // Dispose of the animation controller
     super.dispose();
   }
 
@@ -132,11 +150,116 @@ class _HomescreenState extends State<HomeScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: (selectedIndex == 0) // Show AppBar for home and profile only
+      appBar: (selectedIndex == 0)
           ? AppBar(
               automaticallyImplyLeading: false,
               toolbarHeight: 112.0,
               backgroundColor: const Color(0xFFFA6650),
+              title: StreamBuilder<DocumentSnapshot>(
+                stream: _getUserProfile().asStream(),
+                builder: (context, userSnapshot) {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: _getPets(),
+                    builder: (context, petSnapshot) {
+                      int petCount = 0;
+                      if (petSnapshot.hasData) {
+                        petCount = petSnapshot
+                            .data!.docs.length; // Count the number of pets
+                      }
+
+                      // Time-based greeting
+                      String greeting;
+                      final hour = DateTime.now().hour;
+                      if (hour < 12) {
+                        greeting = 'Good morning';
+                      } else if (hour < 17) {
+                        greeting = 'Good afternoon';
+                      } else {
+                        greeting = 'Good evening';
+                      }
+
+                      // Medal based on pet count
+                      String medalType;
+                      Color medalColor;
+                      if (petCount > 7) {
+                        medalType = "Gold ";
+                        medalColor = Colors.yellow; // Gold color
+                      } else if (petCount >= 2) {
+                        medalType = "Bronze ";
+                        medalColor = Color(0xFFCD7F32); // Bronze color
+                      } else {
+                        medalType = "Silver ";
+                        medalColor = Colors.grey; // Silver color
+                      }
+
+                      // Get user name
+                      String userName = "User"; // Default user name
+                      if (userSnapshot.hasData) {
+                        var userData =
+                            userSnapshot.data!.data() as Map<String, dynamic>;
+                        userName = userData['name'] ??
+                            userName; // Get user name from Firestore
+                      }
+
+                      return Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: medalColor,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    AnimatedBuilder(
+                                      animation: _animation,
+                                      builder: (context, child) {
+                                        return Transform.rotate(
+                                          angle: _animation.value *
+                                              .5 *
+                                              3.14, // Rotate by 360 degrees
+                                          child: const Icon(Icons.star,
+                                              color: Colors.white),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      medalType,
+                                      style: const TextStyle(
+                                          fontSize: 16, color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                  height:
+                                      4), // Space between medal and greeting
+                              Text(
+                                greeting, // Display time-based greeting
+                                style: const TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
+                              const SizedBox(
+                                  height:
+                                      4), // Space between greeting and username
+                              Text(
+                                userName, // Display user's name
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          const Spacer(), // Pushes the content to the left
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
             )
           : null,
       body: selectedIndex == 0
@@ -183,11 +306,13 @@ class _HomescreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         _buildCategoryItem(Icons.event_note, "Notices"),
-                        _buildCategoryItem(Icons.schedule, "Appointment", onTap: () {
+                        _buildCategoryItem(Icons.schedule, "Appointment",
+                            onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DoctorSearchPage(), // Navigate to AdoptionPage
+                              builder: (context) =>
+                                  DoctorSearchPage(), // Navigate to AdoptionPage
                             ),
                           );
                         }), // Navigate to DoctorSearchPage
@@ -195,12 +320,14 @@ class _HomescreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AdoptionPage(), // Navigate to AdoptionPage
+                              builder: (context) =>
+                                  AdoptionPage(), // Navigate to AdoptionPage
                             ),
                           );
                         }),
                         _buildCategoryItem(Icons.shopping_cart, "Pet Market"),
-                        _buildCategoryItem(Icons.miscellaneous_services, "Services"),
+                        _buildCategoryItem(
+                            Icons.miscellaneous_services, "Services"),
                       ],
                     ),
                   ),
@@ -463,10 +590,7 @@ class _HomescreenState extends State<HomeScreen> {
             icon: Icon(Icons.add_circle_outline_rounded),
             label: 'Add Pet',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message), 
-            label: 'Chat'
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Chat'),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
@@ -487,7 +611,8 @@ class _HomescreenState extends State<HomeScreen> {
   }
 
   // Helper function to build a category item with tap support
-  Widget _buildCategoryItem(IconData iconData, String label, {VoidCallback? onTap}) {
+  Widget _buildCategoryItem(IconData iconData, String label,
+      {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -496,7 +621,8 @@ class _HomescreenState extends State<HomeScreen> {
           children: [
             CircleAvatar(
               radius: 25,
-              backgroundColor: const Color.fromARGB(255, 255, 171, 64), // Updated color for icons
+              backgroundColor: const Color.fromARGB(
+                  255, 255, 171, 64), // Updated color for icons
               child: Icon(iconData, color: Colors.white),
             ),
             const SizedBox(height: 8),

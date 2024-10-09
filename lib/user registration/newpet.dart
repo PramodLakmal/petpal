@@ -110,7 +110,19 @@ class _AddPetState extends State<AddPet> {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pet added successfully!')),
+          SnackBar(
+            content: const Text(
+              'Congratulations! You have successfully added a new pet! 🎉',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            backgroundColor: Colors.green, // Background color for success
+            duration:
+                const Duration(seconds: 3), // Duration to show the SnackBar
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+            ),
+          ),
         );
 
         // Navigate back to HomeScreen
@@ -356,7 +368,7 @@ class _AddPetState extends State<AddPet> {
                     ),
                     const SizedBox(height: 15),
                     const Text(
-                      'Description:',
+                      'Love Qoute:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
@@ -364,7 +376,7 @@ class _AddPetState extends State<AddPet> {
                       controller: _descriptionController,
                       maxLines: 3, // Allows multiple lines for description
                       decoration: InputDecoration(
-                        hintText: 'Enter a brief description of your pet',
+                        hintText: 'Type few loving words about your pet',
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
