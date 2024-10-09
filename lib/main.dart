@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:petpal/admin%20side/adminScreens/Usermanagement.dart';
 import 'package:petpal/admin%20side/admin_dashboard.dart';
 import 'package:petpal/admin%20side/admin_login.dart';
 import 'package:petpal/user%20registration/homeScreen.dart';
@@ -71,7 +72,7 @@ class MyApp extends StatelessWidget {
                   bool isAdmin = userSnapshot.data!['isAdmin'] ?? false;
                   return MaterialApp(
                     debugShowCheckedModeBanner: false,
-                    home: isAdmin ? const AdminDashboard() : const Login(),
+                    home: isAdmin ? const Usermanagement() : const Login(),
                   );
                 } else {
                   return const MaterialApp(
