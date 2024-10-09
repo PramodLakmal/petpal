@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:convert'; // Required for base64 decoding
-import 'package:petpal/Screens/adoption/update_adoption_post.dart'; // Import the update page
+import 'dart:convert';
+import 'package:petpal/Screens/adoption/update_adoption_post.dart';
 
 class AdoptionPostDetails extends StatelessWidget {
   final String postId;
@@ -10,16 +10,19 @@ class AdoptionPostDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Fetch the post details from Firestore
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Adoption Post Details'),
-        backgroundColor: Colors.orangeAccent,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.edit, color: Colors.black),
             onPressed: () {
-              // Navigate to the update page with the postId
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -29,10 +32,8 @@ class AdoptionPostDetails extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              _showDeleteConfirmationDialog(context);
-            },
+            icon: const Icon(Icons.delete, color: Colors.black),
+            onPressed: () => _showDeleteConfirmationDialog(context),
           ),
         ],
       ),
@@ -51,37 +52,121 @@ class AdoptionPostDetails extends StatelessWidget {
 
           final post = snapshot.data!.data() as Map<String, dynamic>;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
+          return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: ClipOval(
-                    child: post['imageBase64'] != null 
-                      ? Image.memory(
-                          base64Decode(post['imageBase64']), // Convert Base64 to image
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        )
-                      : const Icon(Icons.pets, size: 120), // Placeholder icon
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: post['imageBase64'] != null
+                    ? Image.memory(
+                        base64Decode(post['imageBase64']),
+                        fit: BoxFit.contain,
+                      )
+                    : const Icon(Icons.pets, size: 120, color: Colors.grey),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            post['name'] ?? 'Unnamed Pet',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${post['age'] ?? 'N/A'} years',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        post['breed'] ?? 'Unknown Breed',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildInfoColumn('Weight', '${post['weight'] ?? 'N/A'} kg'),
+                            _buildInfoColumn('Gender', post['gender'] ?? 'N/A'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Description',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        post['description'] ?? 'No description available.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text('Name: ${post['name'] ?? 'Unnamed Pet'}', style: const TextStyle(fontSize: 20)),
-                Text('Age: ${post['age'] ?? 'N/A'} years'),
-                Text('Breed: ${post['breed'] ?? 'Unknown'}'),
-                Text('Weight: ${post['weight'] ?? 'N/A'} kg'),
-                Text('Gender: ${post['gender'] ?? 'N/A'}'),
-                const SizedBox(height: 16),
-                Text('Description:', style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(post['description'] ?? 'No description available.'),
               ],
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildInfoColumn(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 
@@ -94,17 +179,14 @@ class AdoptionPostDetails extends StatelessWidget {
           content: const Text('Are you sure you want to delete this post?'),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                // Delete the post from Firestore
                 await FirebaseFirestore.instance.collection('adoption').doc(postId).delete();
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.of(context).pop(); // Go back to the previous screen
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Post deleted successfully.')),
                 );

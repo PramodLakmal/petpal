@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   final QueryDocumentSnapshot doctorData;
@@ -13,31 +14,34 @@ class AppointmentBookingPage extends StatefulWidget {
 class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   DateTime selectedDate = DateTime.now();
   String selectedTime = '10:00 AM';
-  final TextEditingController petBreedController = TextEditingController();
-  final TextEditingController petWeightController = TextEditingController();
+  String? selectedPetId;
   String? doctorDescription;
-  
+  final TextEditingController petWeightController = TextEditingController();
+  final TextEditingController petBreedController = TextEditingController();
+
   List<String> availableTimes = [
     '10:00 AM',
     '10:30 AM',
     '11:00 AM',
     '11:30 AM',
     '12:00 PM',
-    '12:30 AM',
-    '14:30 AM',
-    '15:00 AM',
-    '15:30 AM',
-    '16:00 PM'
+    '12:30 PM',
+    '2:30 PM',
+    '3:00 PM',
+    '3:30 PM',
+    '4:00 PM',
   ];
+
+  List<QueryDocumentSnapshot> pets = [];
 
   @override
   void initState() {
     super.initState();
     _fetchDoctorDescription();
+    _fetchUserPets();
   }
 
   void _fetchDoctorDescription() {
-    // Get the doctor's description from Firestore
     FirebaseFirestore.instance
         .collection('doctors')
         .doc(widget.doctorData.id)
@@ -51,19 +55,42 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     });
   }
 
+  void _fetchUserPets() {
+    // Get current user's ID (assuming Firebase Auth)
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    FirebaseFirestore.instance
+        .collection('pets')
+        .where('userId', isEqualTo: userId)
+        .get()
+        .then((querySnapshot) {
+      setState(() {
+        pets = querySnapshot.docs;
+      });
+    });
+  }
+
   Future<void> _createAppointment() async {
+    if (selectedPetId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a pet')),
+      );
+      return;
+    }
+
     try {
       await FirebaseFirestore.instance.collection('appointments').add({
         'doctorId': widget.doctorData.id,
         'location': widget.doctorData['location'],
         'doctorName': widget.doctorData['name'],
         'payment': widget.doctorData['payment'],
-        'petBreed': petBreedController.text,
-        'petWeight': petWeightController.text,
+        'petId': selectedPetId, // Save petId in the appointment
         'appointmentDate': Timestamp.fromDate(selectedDate),
         'appointmentTime': selectedTime,
         'status': 'pending',
         'createdAt': Timestamp.now(),
+        'petBreed': petBreedController.text, // Save pet breed
+        'petWeight': petWeightController.text, // Save pet weight
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -103,8 +130,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                         borderRadius: BorderRadius.circular(8.0),
                         child: Image.network(
                           widget.doctorData['doctorPhoto'],
-                          width: 80,
-                          height: 80,
+                          width: 100,
+                          height: 100,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -146,7 +173,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   ),
                 ),
               ),
-              
+
               // Doctor Description Section
               if (doctorDescription != null) ...[
                 SizedBox(height: 24),
@@ -163,7 +190,26 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ],
-              
+
+              // Pet Selection Dropdown
+              SizedBox(height: 24),
+              DropdownButton<String>(
+                value: selectedPetId,
+                hint: Text('Select Pet'),
+                items: pets.map((QueryDocumentSnapshot pet) {
+                  return DropdownMenuItem<String>(
+                    value: pet.id,
+                    child: Text(pet['name']),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedPetId = newValue;
+                  });
+                },
+              ),
+
+              // Pet Breed and Weight Inputs
               SizedBox(height: 24),
               TextField(
                 controller: petBreedController,
@@ -181,7 +227,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 ),
                 keyboardType: TextInputType.number,
               ),
-              
+
+              // Time Selection
               SizedBox(height: 24),
               Text(
                 'Available Time',
@@ -191,7 +238,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 ),
               ),
               SizedBox(height: 16),
-              Container(
+              SizedBox(
                 height: 50,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -212,7 +259,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   },
                 ),
               ),
-              
+
+              // Date Selection
               SizedBox(height: 24),
               Text(
                 'Date',
@@ -232,7 +280,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   });
                 },
               ),
-              
+
+              // Book Appointment Button
               SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,

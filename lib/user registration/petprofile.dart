@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petpal/Screens/adoption/adoption.dart';
+import 'package:petpal/Screens/appointment/appointment_history_page.dart';
 import 'package:petpal/Screens/completedvaccines.dart';
 import 'package:petpal/Screens/upcomingVaccines.dart';
 import 'package:petpal/user%20registration/editPetProfile.dart';
@@ -345,8 +346,12 @@ class _PetProfileState extends State<PetProfile> {
               title: const Text('Appointments', style: TextStyle(fontSize: 18)),
               trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               onTap: () {
-                // Add functionality for appointments
-              },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>AppointmentHistoryPage(),
+                  ),
+                );              },
             ),
             const Divider(),
 
