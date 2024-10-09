@@ -1,7 +1,6 @@
 import 'dart:convert'; // Required for Base64 decoding
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:petpal/Screens/adoption/adoption.dart';
 import 'package:petpal/Screens/appointment/appointment_history_page.dart';
 import 'package:petpal/Screens/completedvaccines.dart';
 import 'package:petpal/Screens/upcomingVaccines.dart';

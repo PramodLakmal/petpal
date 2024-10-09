@@ -49,12 +49,22 @@ class AppointmentDetailsPage extends StatelessWidget {
                 // Display doctor's photo and name
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundImage: NetworkImage(doctorPhoto), // Doctor's photo from Firestore
+                    Container(
+                      width: 120,  // Set the width of the image
+                      height: 150, // Set the height of the image
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(doctorPhoto), // Doctor's photo from Firestore
+                          fit: BoxFit.cover, // Cover the entire container
+                        ),
+                        borderRadius: BorderRadius.zero, // Ensure no rounded corners
+                      ),
                     ),
                     SizedBox(width: 16),
-                    Text('Dr. $doctorName', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Dr. $doctorName',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
                 SizedBox(height: 16),

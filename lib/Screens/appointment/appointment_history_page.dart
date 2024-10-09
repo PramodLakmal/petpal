@@ -139,10 +139,17 @@ class _AppointmentHistoryPageState extends State<AppointmentHistoryPage> with Si
               children: [
                 Row(
                   children: [
-                    // Display the doctor's image
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(doctorPhoto), // Doctor's image
+                    // Display the doctor's image as a square
+                    Container(
+                      width: 60,  // Set the width of the image
+                      height: 60, // Set the height of the image
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(doctorPhoto), // Doctor's photo from Firestore
+                          fit: BoxFit.cover, // Cover the entire container
+                        ),
+                        borderRadius: BorderRadius.zero, // Ensure no rounded corners
+                      ),
                     ),
                     SizedBox(width: 16),
                     // Doctor's name and appointment time
