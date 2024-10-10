@@ -132,17 +132,17 @@ class _AdoptionPageState extends State<AdoptionPage> {
         );
       },
       child: Card(
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(6),
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           child: Row(
             children: [
               // Display the pet's photo with rounded corners
               ClipRRect(
-                borderRadius: BorderRadius.circular(10), // Adjust the value for more or less rounding
+                borderRadius: BorderRadius.circular(8), // Adjust the value for more or less rounding
                 child: SizedBox(
-                  width: 80,  // Set the width of the image
-                  height: 90, // Set the height of the image
+                  width: 130,  // Set the width of the image
+                  height: 150, // Set the height of the image
                   child: post['imageBase64'] != null 
                       ? Image.memory(
                           base64Decode(post['imageBase64']), // Convert Base64 to image

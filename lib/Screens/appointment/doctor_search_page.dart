@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'dart:math';
 import 'appointment_booking_page.dart';
 
 class DoctorSearchPage extends StatefulWidget {
@@ -12,27 +13,61 @@ class DoctorSearchPage extends StatefulWidget {
 class _DoctorSearchPageState extends State<DoctorSearchPage> {
   TextEditingController _searchController = TextEditingController();
   List<QueryDocumentSnapshot> doctorList = [];
+  bool isSearching = false;
 
   @override
   void initState() {
     super.initState();
-    _getDefaultDoctors();
+    _getRandomDoctors();
   }
 
-  _getDefaultDoctors() async {
-    FirebaseFirestore.instance.collection('doctors').limit(10).get().then((value) {
-      setState(() {
-        doctorList = value.docs;
-      });
+  _getRandomDoctors() async {
+    // First, get all doctors
+    FirebaseFirestore.instance.collection('doctors').get().then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.length > 0) {
+        // Create a list of all doctors
+        List<QueryDocumentSnapshot> allDoctors = querySnapshot.docs;
+        
+        // Randomly select 5 doctors (or less if total doctors are less than 5)
+        int numberOfDoctors = min(5, allDoctors.length);
+        List<QueryDocumentSnapshot> randomDoctors = [];
+        
+        // Create a copy of the list to avoid modifying the original
+        List<QueryDocumentSnapshot> tempList = List.from(allDoctors);
+        
+        for (int i = 0; i < numberOfDoctors; i++) {
+          int randomIndex = Random().nextInt(tempList.length);
+          randomDoctors.add(tempList[randomIndex]);
+          tempList.removeAt(randomIndex);
+        }
+
+        setState(() {
+          doctorList = randomDoctors;
+        });
+      }
     });
   }
 
   _searchDoctorsByLocation(String location) async {
+    setState(() {
+      isSearching = true;
+    });
+
+    if (location.isEmpty) {
+      _getRandomDoctors();
+      setState(() {
+        isSearching = false;
+      });
+      return;
+    }
+
     FirebaseFirestore.instance.collection('doctors')
-        .where('location', isEqualTo: location)
+        .where('location', isGreaterThanOrEqualTo: location)
+        .where('location', isLessThanOrEqualTo: location + '\uf8ff')
         .get().then((value) {
       setState(() {
         doctorList = value.docs;
+        isSearching = false;
       });
     });
   }
@@ -43,21 +78,59 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
       appBar: AppBar(title: Text('Doctors')),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          Container(
+            margin: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 2,
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search a Doctor',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    _searchDoctorsByLocation(_searchController.text);
-                  },
-                ),
+                hintText: 'Search doctors by location...',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: Icon(Icons.location_on, color: Colors.orange),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear, color: Colors.grey),
+                        onPressed: () {
+                          _searchController.clear();
+                          _getRandomDoctors();
+                        },
+                      )
+                    : IconButton(
+                        icon: Icon(Icons.search, color: Colors.orange),
+                        onPressed: () {
+                          _searchDoctorsByLocation(_searchController.text);
+                        },
+                      ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
+              onChanged: (value) {
+                _searchDoctorsByLocation(value);
+              },
             ),
           ),
+          if (isSearching)
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: CircularProgressIndicator(color: Colors.orange),
+            ),
+          if (!isSearching && doctorList.isEmpty)
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Text('No doctors found in this location',
+                  style: TextStyle(color: Colors.grey)),
+            ),
           Expanded(
             child: ListView.builder(
               itemCount: doctorList.length,
@@ -134,7 +207,7 @@ class DoctorCard extends StatelessWidget {
                       Spacer(),
                       Row(
                         children: [
-                          Icon(Icons.star, color: Colors.orange, size: 16),
+                          Icon(Icons.star, color: const Color.fromRGBO(255, 152, 0, 1), size: 16),
                           SizedBox(width: 2),
                           Text('5.0'),
                         ],
