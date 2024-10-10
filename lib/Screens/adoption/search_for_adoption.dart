@@ -283,7 +283,7 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                     child: ElevatedButton.icon(
                       onPressed: () => _navigateToDetails(postId),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 221, 119, 72), // Button background color
+                        backgroundColor: const Color.fromRGBO(255, 152, 0, 1), // Button background color
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10), // Rounded corners
                         ),
