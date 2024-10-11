@@ -123,15 +123,21 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
     super.dispose();
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Find Pets For Adoption",
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
-        ),
         backgroundColor: Colors.white,
         elevation: 0,
+        title: const Text(
+          "Find Pets For Adoption",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -140,23 +146,36 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search for Pet',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: const Icon(Icons.mic),
-                filled: true,
-                fillColor: const Color.fromARGB(255, 255, 255, 255),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(.5),
+                    spreadRadius: 0,
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              onChanged: _searchPosts,
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search for Pet',
+                  prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                  suffixIcon: const Icon(Icons.mic, color: Colors.orange),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                ),
+                onChanged: _searchPosts,
+              ),
             ),
           ),
           Expanded(
@@ -187,27 +206,35 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
 
   Widget _buildPetCard(Map<String, dynamic> post, String postId) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: .2, vertical: 8), // Reduced horizontal margin
-      height: 150,
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Row(
         children: [
-          // Image section
           Container(
-            width: 130, // Increased width for the image
+            width: 130,
+            height: 150,
+            margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: 0,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
               image: post['imageBase64'] != null
                   ? DecorationImage(
                       image: MemoryImage(base64Decode(post['imageBase64'])),
@@ -216,86 +243,67 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                   : null,
             ),
             child: post['imageBase64'] == null
-                ? const Center(child: Icon(Icons.pets, size: 40))
+                ? const Center(child: Icon(Icons.pets))
                 : null,
           ),
-          // Content section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16), // Increased padding
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distribute space evenly
                 children: [
-                  // Top section with breed and favorite icon
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          post['breed'] ?? 'Unknown Breed',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        post['breed'] ?? 'Unknown',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.favorite_border),
+                        onPressed: () {},
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: () {},
                       ),
                     ],
                   ),
-                  // Middle section with age and gender
-                  Row(
-                    children: [
-                      const SizedBox(width: 4),
-                      Text(
-                        '${post['age'] ?? 'Unknown'} Years',
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Icon(
-                        post['gender'] == 'Male' ? Icons.male : Icons.female,
-                        size: 16,
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        post['gender'] ?? 'Unknown',
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 2),
+                  Text(
+                    '${post['age'] ?? 'Unknown'} years',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
                   ),
-                  // Add spacing between text and button
-                  const Spacer(), // Push the button to the bottom
-                  // Adopt Button (smaller and properly aligned at the bottom)
-                  Center(
-                    child: ElevatedButton.icon(
+                  Text(
+                    post['gender'] ?? 'Unknown',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    height: 36,
+                    child: ElevatedButton(
                       onPressed: () => _navigateToDetails(postId),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(255, 152, 0, 1), // Button background color
+                        backgroundColor: Colors.orangeAccent,
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10), // Rounded corners
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16), // Smaller button size
                       ),
-                      icon: const Icon(Icons.pets,color: Colors.white, size: 18), // Smaller icon
-                      label: const Text(
+                      child: const Text(
                         'Adopt',
-                        style: TextStyle(fontSize: 14,color: Colors.white, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

@@ -98,7 +98,18 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Doctors')),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text('Doctors',
+          style: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+          )
+        ),
       body: Column(
         children: [
           Container(
@@ -108,7 +119,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withOpacity(0.4),
                   spreadRadius: 2,
                   blurRadius: 8,
                   offset: Offset(0, 3),
@@ -186,8 +197,20 @@ class DoctorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(8.0),
-      child: Padding(
+      child: Container(
         padding: EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.4),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
