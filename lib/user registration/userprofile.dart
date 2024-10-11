@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,12 +38,17 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Stream<QuerySnapshot> _getUserPets() {
-    User? user = FirebaseAuth.instance.currentUser;
-    return FirebaseFirestore.instance
-        .collection('pets')
-        .where('userId', isEqualTo: user!.uid)
-        .snapshots();
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    // User is not logged in, return an empty stream or handle the case properly
+    return const Stream.empty();
   }
+  
+  return FirebaseFirestore.instance
+      .collection('pets')
+      .where('userId', isEqualTo: user.uid)
+      .snapshots();
+}
 
   // Upload profile photo
   Future<void> _uploadProfilePhoto() async {
@@ -106,7 +114,6 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  // Function to edit profile
   // Function to edit profile
 Future<void> _editProfile() async {
   Navigator.push(
@@ -437,17 +444,17 @@ Future<void> _editProfile() async {
                     children: [
                       const Text(
                         'My pet',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       StreamBuilder<QuerySnapshot>(
                         stream: _getUserPets(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return const CircularProgressIndicator(color: Colors.orange,);
+                            return const CircularProgressIndicator(color: Colors.orange);
                           }
 
                           var pets = snapshot.data!.docs;
+                          print("Pets data: ${pets.length}");
 
                           if (pets.isEmpty) {
                             return const Text("No pets found.");
@@ -457,13 +464,25 @@ Future<void> _editProfile() async {
                             shrinkWrap: true,
                             itemCount: pets.length,
                             itemBuilder: (context, index) {
-                              var pet =
-                                  pets[index].data() as Map<String, dynamic>;
+                              var pet = pets[index].data() as Map<String, dynamic>;
+                              print("Pet details: $pet"); // Debugging line
+                              
+                              // Decode the base64 image string if available
+                              Uint8List? imageBytes;
+                              if (pet['imageBase64'] != null && pet['imageBase64'].isNotEmpty) {
+                                try {
+                                  imageBytes = base64Decode(pet['imageBase64']);
+                                } catch (e) {
+                                  print("Error decoding image for pet ${pet['name']}: $e");
+                                }
+                              }
+
                               return ListTile(
                                 leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      pet['petPhotoUrl'] ??
-                                          'https://via.placeholder.com/80'),
+                                  backgroundColor: Colors.grey[300],
+                                  backgroundImage: imageBytes != null
+                                      ? MemoryImage(imageBytes)  // Use MemoryImage for base64 image
+                                      : NetworkImage('https://via.placeholder.com/80'), // Fallback image
                                 ),
                                 title: Text(pet['name']),
                                 subtitle: Text(pet['breed']),

@@ -202,10 +202,10 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
 
    Widget _buildHeader() {
     return Container(
-      margin: EdgeInsets.all(16),
-      padding: EdgeInsets.all(8),
+      margin: EdgeInsets.all(12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFFF5F3FF),
+        color: Color.fromARGB(255, 231, 231, 231),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -215,9 +215,9 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'How do you create your post?',
+                  'How do you\ncreate your post?',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
