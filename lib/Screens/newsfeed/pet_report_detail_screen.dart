@@ -148,16 +148,21 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
                                     ),
                                     if (isOwner)
                                       ElevatedButton(
-                                        child: Text(isSolved
-                                            ? 'Solved'
-                                            : 'Mark as Solved'),
                                         onPressed:
                                             isSolved ? null : _markAsSolved,
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: isSolved
                                               ? Colors.grey
-                                              : Colors.green,
+                                              : Colors.orangeAccent,
                                         ),
+                                        child: Text(
+                                            isSolved
+                                                ? 'Solved'
+                                                : 'Mark as Solved',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14)),
                                       ),
                                   ],
                                 ),

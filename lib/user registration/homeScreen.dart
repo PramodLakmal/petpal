@@ -14,6 +14,7 @@ import 'package:petpal/user%20registration/newpet.dart';
 
 import 'package:petpal/user%20registration/petprofile.dart';
 import 'package:petpal/user%20registration/userprofile.dart';
+import 'package:petpal/Screens/newsfeed/news_feed_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -305,7 +306,16 @@ class _HomescreenState extends State<HomeScreen>
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildCategoryItem(Icons.event_note, "Notices"),
+                        _buildCategoryItem(Icons.event_note, "News Feed",
+                            onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  NewsFeedScreen(), // Navigate to News Feed
+                            ),
+                          );
+                        }),
                         _buildCategoryItem(Icons.schedule, "Appointment",
                             onTap: () {
                           Navigator.push(
