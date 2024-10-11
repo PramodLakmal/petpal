@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // FirebaseAuth to get the current user
 import 'package:petpal/Screens/adoption/adoption_details.dart';
 import 'package:petpal/Screens/adoption/create_adoption_post.dart';
 import 'package:petpal/Screens/adoption/search_for_adoption.dart'; // Import the SearchForAdoption page
@@ -16,6 +17,9 @@ class _AdoptionPageState extends State<AdoptionPage> {
   // Firestore collection reference
   final CollectionReference _adoptionCollection = 
       FirebaseFirestore.instance.collection('adoption');
+  
+  // Get the current user's UID
+  final String? _currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +76,10 @@ class _AdoptionPageState extends State<AdoptionPage> {
           // My Adoption Posts section
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: _adoptionCollection.orderBy('timestamp', descending: true).snapshots(),
+              stream: _adoptionCollection
+                  .where('userId', isEqualTo: _currentUserId) // Filter posts by logged-in user
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
