@@ -99,8 +99,8 @@ class _AdminLoginState extends State<AdminLogin> {
                 children: [
                   // Left side: Image
                   Expanded(
-                    child: Image.network(
-                      'https://firebasestorage.googleapis.com/v0/b/visioncart-5e1b8.appspot.com/o/Login%20and%20SignUp%2FVisionCart%20Logo.png?alt=media&token=45f2e245-c250-4336-a782-cad91d6b2618',
+                    child: Image.asset(
+                      'images/logo.png',
                       width: 400,
                       height: 400,
                     ),
@@ -122,7 +122,7 @@ class _AdminLoginState extends State<AdminLogin> {
                                 .headlineMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blueAccent,
+                                  color: Colors.orange,
                                   fontSize: 30,
                                 ),
                             textAlign: TextAlign.center,
@@ -159,7 +159,7 @@ class _AdminLoginState extends State<AdminLogin> {
                           ElevatedButton(
                             onPressed: loginUser,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
+                              backgroundColor: Colors.orange,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 15),
                               shape: RoundedRectangleBorder(
@@ -187,7 +187,7 @@ class _AdminLoginState extends State<AdminLogin> {
                             },
                             child: const Text(
                               'Forgot Password?',
-                              style: TextStyle(color: Colors.blueAccent),
+                              style: TextStyle(color: Colors.orange),
                             ),
                           ),
                         ],

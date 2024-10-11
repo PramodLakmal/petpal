@@ -63,132 +63,138 @@ class _LoginState extends State<Login> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: height / 2.7,
-              child: Image.asset("images/login.png"),
-            ),
-            TextFieldInput(
-              hintText: "Email",
-              icon: Icons.email,
-              textEditingController: emailController,
-            ),
-            TextFieldInput(
-              hintText: "Password",
-              icon: Icons.lock,
-              textEditingController: passwordController,
-              isPass: true,
-            ),
-            SizedBox(height: 10),
-            const Forgot_password(),
-            SizedBox(height: height / 35),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFA6650),
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                minimumSize: Size(230.51, 68.1),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 30,
               ),
-              onPressed: loginUsers,
-              child: Text("Login",
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white)),
-            ),
-            SizedBox(height: height / 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Don't have an account?",
+              SizedBox(
+                width: double.infinity,
+                height: height / 2.7,
+                child: Image.asset("images/logo.png"),
+              ),
+              TextFieldInput(
+                hintText: "Email",
+                icon: Icons.email,
+                textEditingController: emailController,
+              ),
+              TextFieldInput(
+                hintText: "Password",
+                icon: Icons.lock,
+                textEditingController: passwordController,
+                isPass: true,
+              ),
+              SizedBox(height: 10),
+              const Forgot_password(),
+              SizedBox(height: height / 35),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  minimumSize: Size(230.51, 68.1),
+                ),
+                onPressed: loginUsers,
+                child: Text("Login",
                     style: TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.bold)),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
+              ),
+              SizedBox(height: height / 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Don't have an account?",
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignUp()),
+                      );
+                    },
+                    child: const Text(
+                      " Sign Up",
+                      style: TextStyle(
+                          color: Colors.orange, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: height / 60),
+              Row(
+                children: [
+                  Expanded(child: Container(height: 2, color: Colors.grey)),
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                  ),
+                  const Text("or"),
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                  ),
+                  Expanded(child: Container(height: 2, color: Colors.grey)),
+                ],
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[100],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: const BorderSide(color: Colors.black45, width: 2),
+                    ),
+                    minimumSize: Size(250, 50),
+                  ),
+                  onPressed: () async {
+                    await FirebaseServices().signInWithGoogle();
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignUp()),
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
                     );
                   },
-                  child: const Text(
-                    " Sign Up",
-                    style: TextStyle(
-                        color: Color(
-                          0xFFFA6650,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: Image.network(
+                          "https://image.similarpng.com/very-thumbnail/2020/06/Logo-google-icon-PNG.png",
+                          height: 35,
                         ),
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: height / 30),
-            Row(
-              children: [
-                Expanded(child: Container(height: 2, color: Colors.grey)),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                ),
-                const Text("or"),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                ),
-                Expanded(child: Container(height: 2, color: Colors.grey)),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[100],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: const BorderSide(color: Colors.black45, width: 2),
-                  ),
-                  minimumSize: Size(250, 50),
-                ),
-                onPressed: () async {
-                  await FirebaseServices().signInWithGoogle();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  );
-                },
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: Image.network(
-                        "https://image.similarpng.com/very-thumbnail/2020/06/Logo-google-icon-PNG.png",
-                        height: 35,
                       ),
-                    ),
-                    const Text(
-                      "Continue with Google",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                      const Text(
+                        "Continue with Google",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 20),
-              color: Color(0xFFFA6650),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(
-                    "All rights reserved",
-                    style: TextStyle(
-                        color: Colors.black, fontSize: 14, letterSpacing: 1.2),
+              // Adjust height
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 20),
+                color: Colors.orange,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      "All rights reserved",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          letterSpacing: 1.2),
+                    ),
                   ),
-                ),
-              ), // Coral orange color
-            )
-          ],
+                ), // Coral orange color
+              ),
+            ],
+          ),
         ),
       ),
     );

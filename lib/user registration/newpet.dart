@@ -115,7 +115,7 @@ class _AddPetState extends State<AddPet> {
               'Congratulations! You have successfully added a new pet! 🎉',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
-            backgroundColor: Colors.green, // Background color for success
+            backgroundColor: Colors.orange, // Background color for success
             duration:
                 const Duration(seconds: 3), // Duration to show the SnackBar
             behavior: SnackBarBehavior.floating,
@@ -153,15 +153,17 @@ class _AddPetState extends State<AddPet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 112.0,
-        title: Center(
-            child: const Text(
+        centerTitle: true,
+        title: const Text(
           'Register Pet',
           style: TextStyle(
-              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
-        )),
-        backgroundColor: Color(0xFFFA6650),
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         // To prevent overflow when keyboard appears
@@ -183,7 +185,7 @@ class _AddPetState extends State<AddPet> {
                   child: _pickedImage == null
                       ? IconButton(
                           icon: const Icon(Icons.add_a_photo,
-                              color: Color(0xFFFA6650)),
+                              color: Colors.orange),
                           onPressed:
                               _pickImage, // Handle add photo functionality
                         )
@@ -195,7 +197,7 @@ class _AddPetState extends State<AddPet> {
                 child: ElevatedButton(
                   onPressed: _pickImage, // Pick image on button press
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFA6650),
+                    backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -211,7 +213,7 @@ class _AddPetState extends State<AddPet> {
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  color: Colors.pink[50],
+                  color: Colors.orange[50],
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Column(
@@ -398,7 +400,7 @@ class _AddPetState extends State<AddPet> {
                       child: ElevatedButton(
                         onPressed: _addPet, // Call function to add pet data
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFA6650),
+                          backgroundColor: Colors.orange,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
