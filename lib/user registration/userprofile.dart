@@ -370,7 +370,7 @@ class _UserProfileState extends State<UserProfile> {
                                 ),
                                 SizedBox(height: 5),
                                 Text(
-                                  'Browse lost and found pets in your community',
+                                  'Browse lost and found pets',
                                   style: TextStyle(color: Colors.white70),
                                 ),
                               ],

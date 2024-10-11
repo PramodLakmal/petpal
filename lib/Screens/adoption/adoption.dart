@@ -24,7 +24,9 @@ class _AdoptionPageState extends State<AdoptionPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         title: const Text(
@@ -42,7 +44,7 @@ class _AdoptionPageState extends State<AdoptionPage> {
               children: [
                 const Text(
                   'Find Pets For Adoption',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                 ),
                 IconButton(
                   icon: const Icon(
@@ -72,8 +74,8 @@ class _AdoptionPageState extends State<AdoptionPage> {
               child: Text(
                 'My Posts Section',
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -155,15 +157,16 @@ class _AdoptionPageState extends State<AdoptionPage> {
         );
       },
       child: Card(
+        color: Colors.grey[100],
         margin: const EdgeInsets.all(6),
+        elevation: 5,
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
               // Display the pet's photo with rounded corners
               ClipRRect(
-                borderRadius: BorderRadius.circular(
-                    8), // Adjust the value for more or less rounding
+                borderRadius: BorderRadius.circular(8), // Adjust the value for more or less rounding
                 child: SizedBox(
                   width: 130, // Set the width of the image
                   height: 150, // Set the height of the image
