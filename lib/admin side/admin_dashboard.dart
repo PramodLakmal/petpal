@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:petpal/admin%20side/adminScreens/Usermanagement.dart';
 import 'package:petpal/admin%20side/admin_login.dart';
 
-
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
 
@@ -15,7 +14,7 @@ class AdminDashboard extends StatelessWidget {
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Column(
@@ -23,11 +22,13 @@ class AdminDashboard extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: GridView.count(
-                      shrinkWrap: true, // Ensures GridView does not take full height
-                      crossAxisCount: constraints.maxWidth > 600 ? 3 : 1,
+                      shrinkWrap: true,
+                      crossAxisCount: constraints.maxWidth > 1200
+                          ? 4
+                          : (constraints.maxWidth > 800 ? 3 : 2),
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
-                      childAspectRatio: 1.2, // Adjust the aspect ratio to make cards smaller
+                      childAspectRatio: 1.5,
                       children: [
                         _buildDashboardCard(
                           context,
@@ -35,47 +36,39 @@ class AdminDashboard extends StatelessWidget {
                           icon: Icons.people,
                           color: Colors.blueAccent,
                           onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => Usermanagement())); // Adjust as needed
-                           
-                          },
-                        ),
-                        _buildDashboardCard(
-                          context,
-                          title: 'Order Management',
-                          icon: Icons.shopping_cart,
-                          color: Colors.green,
-                          onPressed: () {
-                           
-                          },
-                        ),
-                        _buildDashboardCard(
-                          context,
-                          title: 'Item Management',
-                          icon: Icons.inventory,
-                          color: Colors.orange,
-                          onPressed: () {
-                           
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Usermanagement(),
+                              ),
+                            );
                           },
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 20), // Space between grid and logout button
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => const AdminLogin()),
+                      MaterialPageRoute(
+                          builder: (context) => const AdminLogin()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
                     foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
-                  child: const Text('Log Out', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: const Text('Log Out',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -86,28 +79,34 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-  // Dashboard card widget
-  Widget _buildDashboardCard(BuildContext context,
-      {required String title,
-      required IconData icon,
-      required Color color,
-      required VoidCallback onPressed}) {
+  Widget _buildDashboardCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 3,
+      elevation: 8,
+      shadowColor: Colors.grey.withOpacity(0.5),
       child: InkWell(
         onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.all(12.0), // Adjust padding to make the card smaller
+          padding: const EdgeInsets.all(
+              20.0), // Increased padding for a better touch target
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 35, color: color), // Adjust icon size
-              const SizedBox(height: 10), // Space between icon and text
+              Icon(icon,
+                  size: 50,
+                  color: color), // Larger icon size for better visibility
+              const SizedBox(height: 10),
               Text(
                 title,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 20, // Adjust text size
+                  fontSize: 24, // Slightly larger text for better readability
                   fontWeight: FontWeight.bold,
                   color: color,
                 ),

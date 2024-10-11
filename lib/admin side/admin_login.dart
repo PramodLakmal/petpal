@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:petpal/admin%20side/adminScreens/Usermanagement.dart';
 import 'package:petpal/admin%20side/admin_forgot_password.dart';
 import 'package:petpal/user%20registration/homeScreen.dart';
 
@@ -51,7 +52,7 @@ class _AdminLoginState extends State<AdminLogin> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    const AdminDashboard()), // Web Admin Dashboard
+                    const Usermanagement()), // Web Admin Dashboard
           );
         } else {
           // Navigate to respective dashboard

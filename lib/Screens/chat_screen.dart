@@ -123,7 +123,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CircleAvatar(
               backgroundImage: NetworkImage(receiverProfilePhotoUrl ??
-                  'https://cdn-icons-png.flaticon.com/512/5404/5404433.png'), // Default avatar
+                  'https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png'), // Default avatar
             ),
             SizedBox(width: 10),
             Text(widget.selectedUserName),
@@ -131,7 +131,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: Colors.orange,))
           : Column(
               children: [
                 Expanded(
@@ -144,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return Center(child: CircularProgressIndicator());
+                        return Center(child: CircularProgressIndicator(color: Colors.orange,));
                       }
 
                       final messages = snapshot.data!.docs;
@@ -162,7 +162,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ? null // If the current user sent the message, don't show avatar
                                 : CircleAvatar(
                                     backgroundImage: NetworkImage(receiverProfilePhotoUrl ??
-                                        'https://cdn-icons-png.flaticon.com/512/5404/5404433.png'), // Receiver's avatar
+                                        'https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png'), // Receiver's avatar
                                   ),
                             title: Align(
                               alignment: senderId == _currentUserId
@@ -172,8 +172,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: senderId == _currentUserId
-                                      ? Colors.blue[100]
-                                      : Colors.grey[300],
+                                      ? Colors.orange[100]
+                                      : Colors.grey[100],
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(message),
@@ -193,8 +193,15 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: TextField(
                           controller: _messageController,
                           decoration: InputDecoration(
-                            hintText: 'Enter a message',
-                            border: OutlineInputBorder(),
+                            hintText: '     Enter a message',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide(color: Colors.grey[100]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide(color: Colors.orange), // Change to desired color
+                            ),
                           ),
                         ),
                       ),

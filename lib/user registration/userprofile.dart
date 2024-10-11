@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:petpal/Screens/edit_profile_screen.dart';
 import 'dart:io';
 import '../Screens/newsfeed/news_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
@@ -106,10 +107,13 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   // Function to edit profile
-  Future<void> _editProfile() async {
-    // Implement the logic for editing the user's profile here
-    print('Edit Profile pressed');
-  }
+  // Function to edit profile
+Future<void> _editProfile() async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => EditProfileScreen()),
+  );
+}
 
   // Function to delete profile
   Future<void> _deleteProfile() async {
@@ -180,7 +184,7 @@ class _UserProfileState extends State<UserProfile> {
         future: _getUserDetails(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.orange,));
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
@@ -440,7 +444,7 @@ class _UserProfileState extends State<UserProfile> {
                         stream: _getUserPets(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
+                            return const CircularProgressIndicator(color: Colors.orange,);
                           }
 
                           var pets = snapshot.data!.docs;
@@ -474,7 +478,7 @@ class _UserProfileState extends State<UserProfile> {
                 const SizedBox(height: 20),
                 // Posts section
                 DefaultTabController(
-                  length: 4,
+                  length: 3,
                   child: Column(
                     children: [
                       TabBar(
@@ -484,7 +488,6 @@ class _UserProfileState extends State<UserProfile> {
                           Tab(text: 'Posts'),
                           Tab(text: 'Groups'),
                           Tab(text: 'Events'),
-                          Tab(text: 'Photos'),
                         ],
                       ),
                       SizedBox(
@@ -495,7 +498,7 @@ class _UserProfileState extends State<UserProfile> {
                               stream: _getUserPosts(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
-                                  return const CircularProgressIndicator();
+                                  return const CircularProgressIndicator(color: Colors.orange,);
                                 }
 
                                 var posts = snapshot.data!.docs;
@@ -518,7 +521,6 @@ class _UserProfileState extends State<UserProfile> {
                             ),
                             const Center(child: Text('Groups section')),
                             const Center(child: Text('Events section')),
-                            const Center(child: Text('Photos section')),
                           ],
                         ),
                       ),
@@ -582,53 +584,111 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              child: Icon(postData['profilePhotoUrl'] != null
-                  ? Icons.person
-                  : Icons.person),
-            ),
-            title: Text(postData['username'] ?? 'Unknown'),
-            trailing: IconButton(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0), // Rounded corners
+      ),
+      elevation: 2, // Slight shadow for depth
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                radius: 24.0, // Avatar size
+                backgroundImage: postData['userProfilePicture'] != null &&
+                        postData['userProfilePicture'].isNotEmpty
+                    ? NetworkImage(postData['userProfilePicture'])
+                    : NetworkImage('https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png') as ImageProvider,
+              ),
+              title: Text(
+                postData['username'] ?? 'Unknown',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0,
+                ),
+              ),
+              subtitle: Row(
+                children: const [
+                  Text('Golden Retriever • Fayetteville',
+                      style: TextStyle(fontSize: 12.0)),
+                ],
+              ),
+              trailing: IconButton(
               icon: const Icon(Icons.delete, color: Colors.orange),
-              onPressed: () =>
-                  _deletePost(context), // Pass context to _deletePost correctly
+              onPressed: () => _deletePost(context), // Pass context to _deletePost correctly
               tooltip: 'Delete Post',
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(postData['content'] ?? 'No content'),
-          const SizedBox(height: 8),
-          if (postData['images'] != null && postData['images'].isNotEmpty)
-            Column(
-              children: List<Widget>.from(
-                postData['images'].map<Widget>((imageUrl) {
-                  return Image.network(imageUrl);
-                }),
-              ),
+
+              
             ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.thumb_up_alt_outlined),
-                onPressed: () {},
+            const SizedBox(height: 8),
+            Text(
+              postData['content'] ?? 'No content',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            const SizedBox(height: 8),
+            if (postData['images'] != null && postData['images'].isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: postData['images'].map<Widget>((imageUrl) {
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            height: 250, // Adjust image height
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
-              Text('${postData['likes'] ?? 0} Likes'),
-              IconButton(
-                icon: const Icon(Icons.comment),
-                onPressed: () {
-                  // Handle comment press
-                },
-              ),
-              Text('${postData['comments']?.length ?? 0} Comments'),
-            ],
-          ),
-        ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.thumb_up_alt_outlined),
+                      onPressed: () {},
+                    ),
+                    Text('${postData['likes'] ?? 0} Likes'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.comment),
+                      onPressed: () {
+                        // Handle comment press
+                      },
+                    ),
+                    Text('${postData['comments']?.length ?? 0} Comments'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+                        // Handle share press
+                      },
+                    ),
+                    Text('${postData['shares']?.length ?? 0} Shares'),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

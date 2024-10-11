@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:petpal/Screens/community_chat_screen.dart';
 import 'dart:io';
 
 import 'package:petpal/Screens/create_post_screen.dart';
@@ -79,16 +80,20 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
             color: Colors.black,
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            fontFamily: 'Poppins',
           ),
         ),
       actions: [
           IconButton(
             icon: Icon(
-              Icons.notifications_none,
+              Icons.chat,
               color: Colors.black,
             ),
             onPressed: () {
-              // Handle notifications icon tap here
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+              );
             },
           ),
         ],
@@ -112,7 +117,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return Center(child: CircularProgressIndicator(color: Colors.orange,));
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -136,7 +141,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
                       builder: (context, userSnapshot) {
                         if (userSnapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
+                          return Center(child: CircularProgressIndicator(color: Colors.orange));
                         }
 
                         if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
@@ -171,7 +176,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
     future: _firestore.collection('users').doc(post['userId']).get(),
     builder: (context, userSnapshot) {
       if (userSnapshot.connectionState == ConnectionState.waiting) {
-        return Center(child: CircularProgressIndicator());
+        return Center(child: CircularProgressIndicator(color: Colors.orange,));
       }
 
       if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
@@ -313,9 +318,11 @@ class _PostCardState extends State<PostCard> {
         .doc(userId)
         .get();
 
+     if (mounted) {
     setState(() {
       isLiked = likesDoc.exists;
     });
+  }
   }
 
   void toggleLike() async {
@@ -350,51 +357,93 @@ class _PostCardState extends State<PostCard> {
         .add(comment);
   }
 
- @override
+@override
 Widget build(BuildContext context) {
   return Padding(
-    padding: const EdgeInsets.all(2.0), // Add padding around the card
+    padding: const EdgeInsets.all(2.0), // Slightly larger padding
     child: Card(
-      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0), // Rounded corners
+      ),
+      color: Colors.white, // Subtle background color
+      margin: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
       child: Padding( // Add padding inside the card
-        padding: const EdgeInsets.all(10.0), 
+        padding: const EdgeInsets.all(6.0), 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
               leading: CircleAvatar(
-                  radius: 20.0,
-                  backgroundImage: widget.userProfilePicture.isNotEmpty
-                      ? NetworkImage(widget.userProfilePicture)
-                      : AssetImage('images/catpaw.png') // Fallback to a placeholder image
-                          as ImageProvider,      
-                ),
-              title: Text(widget.userName, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                radius: 24.0, // Slightly larger avatar
+                backgroundImage: widget.userProfilePicture.isNotEmpty
+                    ? NetworkImage(widget.userProfilePicture)
+                    : NetworkImage('https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png') as ImageProvider,
+              ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.userName,
+                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Golden Retriever • Fayetteville',
+                    style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 10.0),
-            Text(widget.content, style: TextStyle(fontSize: 18.0)),
-            SizedBox(height: 10.0),
+            SizedBox(height: 8.0),
+            Text(widget.content, style: TextStyle(fontSize: 16.0)),
+            SizedBox(height: 8.0),
             if (widget.images.isNotEmpty)
-              Column(
+              GridView.count(
+                shrinkWrap: true, // Prevents expanding
+                crossAxisCount: 1, // Display in 1 column
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
                 children: widget.images
-                    .map((imageUrl) => Image.network(imageUrl))
+                    .map((imageUrl) => ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0), // Rounded image borders
+                        child: Image.network(imageUrl, fit: BoxFit.cover)))
                     .toList(),
               ),
             SizedBox(height: 12.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                IconButton(
-                  icon: Icon(
-                    isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                    color: isLiked ? Colors.orange : null,
-                  ),
-                  onPressed: toggleLike,
+                // Replace the existing IconButton for likes with FutureBuilder
+                FutureBuilder<DocumentSnapshot>(
+                  future: _firestore
+                      .collection('posts')
+                      .doc(widget.postId)
+                      .collection('likes')
+                      .doc(_auth.currentUser?.uid)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator(color: Colors.orange);
+                    }
+
+                    if (!snapshot.hasData) {
+                      return Text('Error loading likes');
+                    }
+
+                    final isLiked = snapshot.data!.exists;
+
+                    return IconButton(
+                      icon: Icon(
+                        isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                        color: isLiked ? Colors.orange : Colors.grey,
+                      ),
+                      onPressed: toggleLike, // Your toggle function remains unchanged
+                    );
+                  },
                 ),
-                Text('${widget.likes} Likes', style: TextStyle(color: isLiked ? Colors.orange : null)),
+                Text('${widget.likes} Likes', style: TextStyle(color: isLiked ? Colors.orange : Colors.black54)),
                 SizedBox(width: 16.0),
                 IconButton(
-                  icon: Icon(Icons.comment),
+                  icon: Icon(Icons.comment, color: Colors.grey),
                   onPressed: () {
                     showModalBottomSheet(
                         context: context,
@@ -403,7 +452,7 @@ Widget build(BuildContext context) {
                         });
                   },
                 ),
-                Text('${widget.comments.length} Comments'), // Display comment count
+                Text('${widget.comments.length} Comments', style: TextStyle(color: Colors.black54)),
               ],
             ),
           ],
@@ -412,6 +461,8 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
+
 
 }
 

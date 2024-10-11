@@ -44,6 +44,7 @@ dependencies:
   firebase_app_check: ^0.3.1+1
   timeago: ^3.7.0
   google_fonts: ^6.2.1
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +72,10 @@ flutter:
   assets:
      - images/login.png
      - images/catpaw.png
+     - images/clinic.jpg
+     - images/1.jpg
+     - images/2.jpg
+     - images/3.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

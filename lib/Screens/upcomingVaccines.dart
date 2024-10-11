@@ -65,43 +65,234 @@ class _UpcomingVaccinesState extends State<UpcomingVaccines> {
     }
   }
 
+  // Function to show the description in a dialog
+  void _showDescriptionDialog(String description) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vaccine Description'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(description),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upcoming Vaccines'),
-        backgroundColor: Colors.orangeAccent,
+        toolbarHeight: 112.0,
+        title: const Text(
+          'Upcoming Vaccine',
+          style: TextStyle(
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Color(0xFFFA6650),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: upcomingVaccines.isEmpty
-            ? const Center(
-                child:
-                    CircularProgressIndicator()) // Show loading spinner while fetching data
-            : ListView.builder(
-                itemCount: upcomingVaccines.length,
-                itemBuilder: (context, index) {
-                  final vaccine = upcomingVaccines[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      title: Text(vaccine['vaccineName']),
-                      subtitle: Text('Scheduled Date: ${vaccine['date']}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.check_circle_outline,
-                                color: Colors.green),
-                            onPressed: () =>
-                                _updateVaccineStatus(vaccine['id']),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+        child: Column(
+          children: [
+            // Add the clinic image at the start of the body
+            SizedBox(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  'images/clinic.jpg', // Path to your image
+                  width: double.infinity, // Set the width of the image
+                  height: 200, // Set the height of the image
+                ),
               ),
+            ),
+            const SizedBox(height: 16), // Add some space after the image
+            upcomingVaccines.isEmpty
+                ? const Center(
+                    child: Text(
+                      "Your pet's health is up to date!",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: upcomingVaccines.length,
+                      itemBuilder: (context, index) {
+                        final vaccine = upcomingVaccines[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.pink[50],
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: const Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Heading "Vaccine Info"
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0),
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                    'Vaccine Info',
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.medical_services,
+                                              size: 20),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Vaccine Name: ${vaccine['vaccineName']}',
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.calendar_today,
+                                              size: 20),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Date: ${vaccine['date']}',
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.access_time,
+                                              size: 20),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Time: ${vaccine['time']}',
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.location_on,
+                                              size: 20),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Venue: ${vaccine['venue']}',
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.description,
+                                              size: 20),
+                                          const SizedBox(width: 8),
+                                          const Text(
+                                            'Description:',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          IconButton(
+                                            icon:
+                                                const Icon(Icons.arrow_forward),
+                                            onPressed: () =>
+                                                _showDescriptionDialog(
+                                                    vaccine['description'] ??
+                                                        ''),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ),
+                                ),
+                                // Check button to update vaccine status
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      onPressed: () =>
+                                          _updateVaccineStatus(vaccine['id']),
+                                      child: const Text(
+                                        'Mark as Vaccinated',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ],
+        ),
       ),
     );
   }
