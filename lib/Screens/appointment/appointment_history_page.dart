@@ -41,11 +41,13 @@ class _AppointmentHistoryPageState extends State<AppointmentHistoryPage> with Si
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Appointments'),
+        title: Text('Appointments',
+        style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600)
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: 'Upcoming'),
+            Tab(text: 'Upcoming',),
             Tab(text: 'Completed'),
             Tab(text: 'Cancelled'),
           ],

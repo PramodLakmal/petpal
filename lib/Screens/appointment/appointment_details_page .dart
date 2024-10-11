@@ -24,7 +24,9 @@ class AppointmentDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Appointment Details'),
+        title: Text('Appointment Details',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
+        ),
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: _getDoctorDetails(doctorId), // Fetch doctor details
