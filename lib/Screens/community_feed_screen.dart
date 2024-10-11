@@ -200,73 +200,54 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> {
 }
 
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Stack(
+   Widget _buildHeader() {
+    return Container(
+      margin: EdgeInsets.all(16),
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Color(0xFFF5F3FF),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
         children: [
-          Container(
-            width: 110,
-            height: 190,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              image: DecorationImage(
-                image: NetworkImage(
-                    'https://th.bing.com/th/id/R.86bebc8ceb313545207c639be56f0651?rik=JOO9Wnj8b0GWTA&riu=http%3a%2f%2fpngimg.com%2fuploads%2fdog%2fdog_PNG50380.png&ehk=othL9M41KKnxNrXWUSnkAmjsQ%2fiWbfeqyhCdWFCEDIQ%3d&risl=1&pid=ImgRaw&r=0'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            height: 150,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              color: Colors.black.withOpacity(0.1),
-            ),
-          ),
-          Positioned(
-            left: 105,
-            top: 16,
-            child: Container(
-              width: MediaQuery.of(context).size.width - 32,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "How do you create your post?",
-                  hintStyle: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'How do you create your post?',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    postContent = value;
-                  });
-                },
-              ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CreatePostScreen()),
+                    );
+                  },
+                  child: Text('Create'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          Positioned(
-            right: 25,
-            bottom: 25,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreatePostScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-              child: Text("Create"),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              'https://th.bing.com/th/id/R.86bebc8ceb313545207c639be56f0651?rik=JOO9Wnj8b0GWTA&riu=http%3a%2f%2fpngimg.com%2fuploads%2fdog%2fdog_PNG50380.png&ehk=othL9M41KKnxNrXWUSnkAmjsQ%2fiWbfeqyhCdWFCEDIQ%3d&risl=1&pid=ImgRaw&r=0',
+              width: 100,
+              height: 160,
+              fit: BoxFit.fill,
             ),
           ),
         ],
@@ -360,15 +341,15 @@ class _PostCardState extends State<PostCard> {
 @override
 Widget build(BuildContext context) {
   return Padding(
-    padding: const EdgeInsets.all(2.0), // Slightly larger padding
+    padding: const EdgeInsets.all(0), // Slightly larger padding
     child: Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0), // Rounded corners
+        borderRadius: BorderRadius.circular(12.0), // Rounded corners
       ),
       color: Colors.white, // Subtle background color
       margin: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
       child: Padding( // Add padding inside the card
-        padding: const EdgeInsets.all(6.0), 
+        padding: const EdgeInsets.all(12.0), 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -453,7 +434,15 @@ Widget build(BuildContext context) {
                   },
                 ),
                 Text('${widget.comments.length} Comments', style: TextStyle(color: Colors.black54)),
+                IconButton(
+                  icon: Icon(Icons.share, color: Colors.grey),
+                  onPressed: () {
+                    // Handle share press
+                  },
+                ),
+                Text('Shares', style: TextStyle(color: Colors.black54)),
               ],
+                
             ),
           ],
         ),
