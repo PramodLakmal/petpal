@@ -107,12 +107,20 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Appointment'),
+        title: Text('Appointment',
+        style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+          ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -122,6 +130,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             children: [
               // Doctor Info Card
               Card(
+                color: Colors.grey[100],
+                elevation: 5,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -289,7 +299,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 child: ElevatedButton(
                   onPressed: _createAppointment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFA6650),
+                    backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),

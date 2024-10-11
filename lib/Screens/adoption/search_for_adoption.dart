@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:petpal/Screens/adoption/search_adoption_post_details.dart';
@@ -20,11 +21,21 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
   List<DocumentSnapshot> _randomPets = [];
   bool _isSearching = false;
   bool _isLoadingInitial = true;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _loadRandomPets();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadRandomPets() async {
@@ -67,6 +78,13 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
     }
   }
 
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _searchPosts(_searchController.text);
+    });
+  }
+
   void _searchPosts(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -81,21 +99,15 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
     });
 
     try {
-      QuerySnapshot querySnapshot = await _adoptionCollection
-          .where('name', isGreaterThanOrEqualTo: query.toLowerCase())
-          .where('name', isLessThanOrEqualTo: query.toLowerCase() + '\uf8ff')
-          .orderBy('name')
-          .get();
-
       QuerySnapshot breedSnapshot = await _adoptionCollection
           .where('breed', isGreaterThanOrEqualTo: query.toLowerCase())
           .where('breed', isLessThanOrEqualTo: query.toLowerCase() + '\uf8ff')
           .orderBy('breed')
+          .limit(20) // Limit the results to improve performance
           .get();
 
       setState(() {
-        _searchResults = [...querySnapshot.docs, ...breedSnapshot.docs];
-        _searchResults = _searchResults.toSet().toList();
+        _searchResults = breedSnapshot.docs;
         _isSearching = false;
       });
     } catch (e) {
@@ -118,12 +130,6 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
   }
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-@override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -174,7 +180,6 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
-                onChanged: _searchPosts,
               ),
             ),
           ),

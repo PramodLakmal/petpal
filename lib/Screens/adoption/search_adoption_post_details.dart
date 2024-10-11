@@ -48,7 +48,7 @@ class SearchAdoptionPostDetails extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.45,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.orange[50],
+                    color: const Color.fromARGB(255, 255, 255, 255),
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
