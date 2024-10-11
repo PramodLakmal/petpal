@@ -69,8 +69,7 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
         final imageBase64 = await _convertImageToBase64();
 
         // Generate a new document reference with a unique ID
-        DocumentReference docRef =
-            FirebaseFirestore.instance.collection('adoption').doc();
+        DocumentReference docRef = FirebaseFirestore.instance.collection('adoption').doc();
 
         // Use the generated document ID as postId
         String postId = docRef.id;
@@ -136,8 +135,7 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Adoption Post',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
-        ),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -164,8 +162,7 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                       : null, // Display the picked image
                   child: _pickedImage == null
                       ? IconButton(
-                          icon: const Icon(Icons.add_a_photo,
-                              color: Colors.orange),
+                          icon: const Icon(Icons.add_a_photo, color: Colors.orange),
                           onPressed: _pickImage, // Handle add photo functionality
                         )
                       : null,
@@ -176,14 +173,17 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                 child: ElevatedButton(
                   onPressed: _pickImage, // Pick image on button press
                   style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                    backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Add Photo',
-                  style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                  child: const Text(
+                    'Add Photo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -191,8 +191,22 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.orange[100]!,
+                      Colors.orange[50]!,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10.0,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,11 +219,26 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Name:'),
+                    const Text('Name:', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter pet\'s name',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintStyle: TextStyle(color: Colors.grey), // Hint text color
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -219,11 +248,26 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    const Text('Age:'),
+                    const Text('Age:', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextFormField(
                       controller: _ageController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter pet\'s age',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintStyle: TextStyle(color: Colors.grey), // Hint text color
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -237,11 +281,26 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    const Text('Breed:'),
+                    const Text('Breed:', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextFormField(
                       controller: _breedController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter pet\'s breed',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintStyle: TextStyle(color: Colors.grey), // Hint text color
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -251,12 +310,28 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    const Text('Description:'),
+                    const Text('Description:', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Enter pet\'s description',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintStyle: TextStyle(color: Colors.grey), // Hint text color
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30), // Curvier borders
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
                       ),
+                      maxLines: 4,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter the pet\'s description';
@@ -271,7 +346,7 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Gender:'),
+                              const Text('Gender:', style: TextStyle(fontWeight: FontWeight.bold)),
                               DropdownButtonFormField<String>(
                                 value: _gender,
                                 onChanged: (newValue) {
@@ -279,15 +354,30 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                                     _gender = newValue!;
                                   });
                                 },
-                                items: <String>[
-                                  'Male',
-                                  'Female'
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: <String>['Male', 'Female']
+                                    .map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
                                   );
                                 }).toList(),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hintStyle: TextStyle(color: Colors.grey), // Hint text color
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // Curvier borders
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // Curvier borders
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // Curvier borders
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -297,11 +387,26 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Weight (kg):'),
+                              const Text('Weight (kg):', style: TextStyle(fontWeight: FontWeight.bold)),
                               TextFormField(
                                 controller: _weightController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: 'Enter weight',
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hintStyle: TextStyle(color: Colors.grey), // Hint text color
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // Curvier borders
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // Curvier borders
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // Curvier borders
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -319,19 +424,27 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _addAdoptionPost, // Add adoption post on button press
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          'Submit Post',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _addAdoptionPost, // Trigger add adoption post function
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                child: const Text('Create Adoption Post',
-                style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),),
               ),
             ],
           ),

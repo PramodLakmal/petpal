@@ -40,7 +40,9 @@ class _AppointmentHistoryPageState extends State<AppointmentHistoryPage> with Si
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         title: Text('Appointments',
         style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600)
         ),
@@ -133,7 +135,9 @@ class _AppointmentHistoryPageState extends State<AppointmentHistoryPage> with Si
         String doctorPhoto = doctorData['doctorPhoto'];
 
         return Card(
+          color: Colors.grey[200],
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 5,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -183,8 +187,19 @@ class _AppointmentHistoryPageState extends State<AppointmentHistoryPage> with Si
                           ),
                         );
                       },
-                      child: Text('Details'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange[500], // Change the button color to orange[100]
+                        elevation: 2, // Optional: adds a subtle shadow
+                      ),
+                      child: const Text(
+                        'Details',
+                        style: TextStyle(
+                          color: Colors.white, // Change the text color to white
+                          fontWeight: FontWeight.w600, // Optional: makes the text bold
+                        ),
+                      ),
                     ),
+
                     // Actions to mark appointment as completed or cancelled
                     Row(
                       children: [

@@ -213,7 +213,7 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.grey[200],
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
