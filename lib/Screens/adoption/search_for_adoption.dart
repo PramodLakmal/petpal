@@ -188,7 +188,7 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
       margin: const EdgeInsets.symmetric(horizontal: .2, vertical: 8), // Reduced horizontal margin
       height: 150,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F0),
+        color: const Color.fromARGB(255, 255, 255, 255),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
