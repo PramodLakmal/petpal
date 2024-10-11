@@ -11,7 +11,6 @@ import 'package:petpal/Screens/community_chat_screen.dart';
 import 'package:petpal/Screens/community_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
 import 'package:petpal/user%20registration/newpet.dart';
-
 import 'package:petpal/user%20registration/petprofile.dart';
 import 'package:petpal/user%20registration/userprofile.dart';
 
@@ -263,315 +262,315 @@ class _HomescreenState extends State<HomeScreen>
             )
           : null,
       body: selectedIndex == 0
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image carousel section
-                SizedBox(
-                  width: double.infinity,
-                  height: height / 3.5,
-                  child: PageView.builder(
-                    controller: _pageController, // Use the PageController
-                    itemCount: _images.length,
-                    itemBuilder: (context, index) {
-                      return Image.asset(
-                        _images[index],
-                        height: 40,
-                        fit: BoxFit
-                            .cover, // Ensure the image covers the container
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // "Category" Title
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    "Category",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-
-                // Horizontal Category Scroll Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildCategoryItem(Icons.event_note, "Notices"),
-                        _buildCategoryItem(Icons.schedule, "Appointment",
-                            onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  DoctorSearchPage(), // Navigate to AdoptionPage
-                            ),
-                          );
-                        }), // Navigate to DoctorSearchPage
-                        _buildCategoryItem(Icons.pets, "Adoption", onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  AdoptionPage(), // Navigate to AdoptionPage
-                            ),
-                          );
-                        }),
-                        _buildCategoryItem(Icons.shopping_cart, "Pet Market"),
-                        _buildCategoryItem(
-                            Icons.miscellaneous_services, "Services"),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // "My Pets" Section with Title and Paw Icon
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: const [
-                          Text(
-                            "My Pets",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          SizedBox(width: 10),
-                          Image(
-                            image: AssetImage("images/catpaw.png"),
-                            height: 30,
-                            width: 30,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Search bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10),
-                  child: TextField(
-                    controller: _searchController, // Assign the controller
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(30)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(30)),
-                      hintText: "Search ...",
-                      prefixIcon: const Icon(Icons.search),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery =
-                            value.toLowerCase(); // Update the search query
-                      });
-                    },
-                  ),
-                ),
-
-                // Fetching and Displaying Pet Data
-                const SizedBox(height: 20),
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: _getPets(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return const Center(
-                          child: Text("No pets found for the current user."),
-                        );
-                      }
-
-                      // Filter pets based on search query
-                      var pets = snapshot.data!.docs.where((pet) {
-                        return pet['name']
-                            .toString()
-                            .toLowerCase()
-                            .contains(_searchQuery);
-                      }).toList();
-
-                      // Display list of pets
-                      return ListView.builder(
-                        itemCount: pets.length,
+          ? SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Image carousel section
+                    SizedBox(
+                      width: double.infinity,
+                      height: height / 3.5,
+                      child: PageView.builder(
+                        controller: _pageController, // Use the PageController
+                        itemCount: _images.length,
                         itemBuilder: (context, index) {
-                          var pet = pets[index];
-                          var imageBase64 = pet['imageBase64'];
-
-                          Uint8List? imageBytes;
-                          if (imageBase64 != null && imageBase64.isNotEmpty) {
-                            try {
-                              imageBytes = base64Decode(imageBase64);
-                            } catch (e) {
-                              print(
-                                  'Error decoding image for pet ${pet.id}: $e');
-                            }
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: double
-                                      .infinity, // Set width to fill the available space
-                                  height:
-                                      200, // Set a fixed height for the card
-                                  child: Card(
-                                    color: Colors.pink[50],
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: ListTile(
-                                      contentPadding: const EdgeInsets.all(
-                                          16.0), // Padding inside the ListTile
-                                      title: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // Left side: Image container
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                                15), // Rounded corners for the image
-                                            child: Container(
-                                              width: 150, // Adjusted width
-                                              height:
-                                                  150, // Adjusted height for better fit
-                                              color: Colors.grey[300],
-                                              child: imageBytes == null
-                                                  ? Image.asset(
-                                                      "images/catpaw.png",
-                                                      fit: BoxFit.contain,
-                                                    )
-                                                  : Image.memory(
-                                                      imageBytes,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                              width:
-                                                  16), // Space between image and text
-                                          // Right side: Name and Description
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5),
-                                                  child: Text(
-                                                    pet['name'],
-                                                    style: const TextStyle(
-                                                      fontSize:
-                                                          24, // Adjust font size for the name
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                    height:
-                                                        8), // Space between name and description
-                                                Center(
-                                                  child: Container(
-                                                    height: 50,
-                                                    width: double.infinity,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 10),
-                                                    child: Text(
-                                                      pet['description'],
-                                                      style: const TextStyle(
-                                                          fontSize:
-                                                              16, // Adjust font size for description
-                                                          color: Colors.black
-                                                          // Optional: Add color for description
-                                                          ),
-                                                      maxLines:
-                                                          2, // Limit the number of description lines
-                                                      overflow: TextOverflow
-                                                          .ellipsis, // Add ellipsis if text overflows
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        // Safely parse age and weight
-                                        int petAge = _parseAge(pet['age']);
-                                        double petWeight =
-                                            _parseWeight(pet['weight']);
-
-                                        // Debugging: Print types and values
-                                        print('Navigating to PetProfile with:');
-                                        print('Name: ${pet['name']}');
-                                        print('Breed: ${pet['breed']}');
-                                        print(
-                                            'Age: $petAge (type: ${petAge.runtimeType})');
-                                        print(
-                                            'Weight: $petWeight (type: ${petWeight.runtimeType})');
-
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PetProfile(
-                                              name: pet['name'],
-                                              breed: pet['breed'],
-                                              age: petAge, // Now safely int
-                                              gender: pet['gender'],
-                                              weight:
-                                                  petWeight, // Now safely double
-                                              petId: pet.id,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          return Image.asset(
+                            _images[index],
+                            height: 40,
+                            fit: BoxFit
+                                .cover, // Ensure the image covers the container
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // "Category" Title
+                    Text(
+                      "Category",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+
+                    // Horizontal Category Scroll Bar
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildCategoryItem(Icons.event_note, "Notices"),
+                          _buildCategoryItem(Icons.schedule, "Appointment",
+                              onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DoctorSearchPage(), // Navigate to DoctorSearchPage
+                              ),
+                            );
+                          }), // Navigate to DoctorSearchPage
+                          _buildCategoryItem(Icons.pets, "Adoption", onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AdoptionPage(), // Navigate to AdoptionPage
+                              ),
+                            );
+                          }),
+                          _buildCategoryItem(Icons.shopping_cart, "Pet Market"),
+                          _buildCategoryItem(
+                              Icons.miscellaneous_services, "Services"),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // "My Pets" Section with Title and Paw Icon
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: const [
+                            Text(
+                              "My Pets",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                            SizedBox(width: 10),
+                            Image(
+                              image: AssetImage("images/catpaw.png"),
+                              height: 30,
+                              width: 30,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    // Search bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 0.0, vertical: 10),
+                      child: TextField(
+                        controller: _searchController, // Assign the controller
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(30)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(30)),
+                          hintText: "Search ...",
+                          prefixIcon: const Icon(Icons.search),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery =
+                                value.toLowerCase(); // Update the search query
+                          });
+                        },
+                      ),
+                    ),
+
+                    // Fetching and Displaying Pet Data
+                    const SizedBox(height: 20),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: _getPets(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Text("No pets found for the current user."),
+                          );
+                        }
+
+                        // Filter pets based on search query
+                        var pets = snapshot.data!.docs.where((pet) {
+                          return pet['name']
+                              .toString()
+                              .toLowerCase()
+                              .contains(_searchQuery);
+                        }).toList();
+
+                        // Display list of pets
+                        return ListView.builder(
+                          shrinkWrap: true, // Add this
+                          physics: NeverScrollableScrollPhysics(), // And this
+                          itemCount: pets.length,
+                          itemBuilder: (context, index) {
+                            var pet = pets[index];
+                            var imageBase64 = pet['imageBase64'];
+
+                            Uint8List? imageBytes;
+                            if (imageBase64 != null && imageBase64.isNotEmpty) {
+                              try {
+                                imageBytes = base64Decode(imageBase64);
+                              } catch (e) {
+                                print(
+                                    'Error decoding image for pet ${pet.id}: $e');
+                              }
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: double
+                                        .infinity, // Set width to fill the available space
+                                    height:
+                                        200, // Set a fixed height for the card
+                                    child: Card(
+                                      color: Colors.pink[50],
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: ListTile(
+                                        contentPadding: const EdgeInsets.all(
+                                            16.0), // Padding inside the ListTile
+                                        title: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Left side: Image container
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(
+                                                  15), // Rounded corners for the image
+                                              child: Container(
+                                                width: 150, // Adjusted width
+                                                height:
+                                                    150, // Adjusted height for better fit
+                                                color: Colors.grey[300],
+                                                child: imageBytes == null
+                                                    ? Image.asset(
+                                                        "images/catpaw.png",
+                                                        fit: BoxFit.contain,
+                                                      )
+                                                    : Image.memory(
+                                                        imageBytes,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                                width:
+                                                    16), // Space between image and text
+                                            // Right side: Name and Description
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 5),
+                                                    child: Text(
+                                                      pet['name'],
+                                                      style: const TextStyle(
+                                                        fontSize:
+                                                            24, // Adjust font size for the name
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                      height:
+                                                          8), // Space between name and description
+                                                  Center(
+                                                    child: Container(
+                                                      height: 50,
+                                                      width: double.infinity,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 10),
+                                                      child: Text(
+                                                        pet['description'],
+                                                        style: const TextStyle(
+                                                            fontSize:
+                                                                16, // Adjust font size for description
+                                                            color: Colors.black
+                                                            // Optional: Add color for description
+                                                            ),
+                                                        maxLines:
+                                                            2, // Limit the number of description lines
+                                                        overflow: TextOverflow
+                                                            .ellipsis, // Add ellipsis if text overflows
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          // Safely parse age and weight
+                                          int petAge = _parseAge(pet['age']);
+                                          double petWeight =
+                                              _parseWeight(pet['weight']);
+
+                                          // Debugging: Print types and values
+                                          print(
+                                              'Navigating to PetProfile with:');
+                                          print('Name: ${pet['name']}');
+                                          print('Breed: ${pet['breed']}');
+                                          print(
+                                              'Age: $petAge (type: ${petAge.runtimeType})');
+                                          print(
+                                              'Weight: $petWeight (type: ${petWeight.runtimeType})');
+
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PetProfile(
+                                                name: pet['name'],
+                                                breed: pet['breed'],
+                                                age: petAge, // Now safely int
+                                                gender: pet['gender'],
+                                                weight:
+                                                    petWeight, // Now safely double
+                                                petId: pet.id,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20), // Add some space at the bottom
+                  ],
                 ),
-              ],
+              ),
             )
           : _pages[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
