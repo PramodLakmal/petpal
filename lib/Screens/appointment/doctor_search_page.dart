@@ -181,10 +181,10 @@ class DoctorCard extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 5),
                   Text(doctor['location'], 
-                    style: TextStyle(color: Colors.grey)),
+                    style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
                   SizedBox(height: 5),
                   Text('Payment: LKR ${doctor['payment']}', 
-                    style: TextStyle(color: Colors.grey)),
+                    style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
                   SizedBox(height: 10),
                   Row(
                     children: [
@@ -207,7 +207,7 @@ class DoctorCard extends StatelessWidget {
                       Spacer(),
                       Row(
                         children: [
-                          Icon(Icons.star, color: const Color.fromRGBO(255, 152, 0, 1), size: 16),
+                          Icon(Icons.star, color: Colors.orange, size: 16),
                           SizedBox(width: 2),
                           Text('5.0'),
                         ],
