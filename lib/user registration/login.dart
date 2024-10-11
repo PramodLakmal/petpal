@@ -68,9 +68,12 @@ class _LoginState extends State<Login> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
+                height: 30,
+              ),
+              SizedBox(
                 width: double.infinity,
                 height: height / 2.7,
-                child: Image.asset("images/login.png"),
+                child: Image.asset("images/logo.png"),
               ),
               TextFieldInput(
                 hintText: "Email",
@@ -88,7 +91,7 @@ class _LoginState extends State<Login> {
               SizedBox(height: height / 35),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFA6650),
+                  backgroundColor: Colors.orange,
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   minimumSize: Size(230.51, 68.1),
                 ),
@@ -116,15 +119,12 @@ class _LoginState extends State<Login> {
                     child: const Text(
                       " Sign Up",
                       style: TextStyle(
-                          color: Color(
-                            0xFFFA6650,
-                          ),
-                          fontWeight: FontWeight.bold),
+                          color: Colors.orange, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: height / 30),
+              SizedBox(height: height / 60),
               Row(
                 children: [
                   Expanded(child: Container(height: 2, color: Colors.grey)),
@@ -175,11 +175,11 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20), // Adjust height
+              // Adjust height
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 20),
-                color: Color(0xFFFA6650),
+                color: Colors.orange,
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),

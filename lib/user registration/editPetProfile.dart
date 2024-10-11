@@ -122,12 +122,16 @@ class _EditPetState extends State<EditPet> {
     }
 
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           toolbarHeight: 112.0,
+          centerTitle: true,
           title: const Text("Edit Pet Profile",
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-          backgroundColor: Color(0xFFFA6650),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 30)),
+          backgroundColor: Colors.white,
           elevation: 0,
         ),
         body: Padding(
@@ -146,6 +150,7 @@ class _EditPetState extends State<EditPet> {
                     children: [
                       // Name Field with Icon
                       Card(
+                        color: Colors.orange[50],
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -174,6 +179,7 @@ class _EditPetState extends State<EditPet> {
 
                       // Breed Field with Icon
                       Card(
+                        color: Colors.orange[50],
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -202,6 +208,7 @@ class _EditPetState extends State<EditPet> {
 
                       // Age Field with Icon
                       Card(
+                        color: Colors.orange[50],
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -231,6 +238,7 @@ class _EditPetState extends State<EditPet> {
 
                       // Gender Field with Icon
                       Card(
+                        color: Colors.orange[50],
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -274,6 +282,7 @@ class _EditPetState extends State<EditPet> {
 
                       // Weight Field with Icon
                       Card(
+                        color: Colors.orange[50],
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -321,7 +330,7 @@ class _EditPetState extends State<EditPet> {
                     fontSize: 20,
                     color: Colors.white),
               ),
-              backgroundColor: Color(0xFFFA6650),
+              backgroundColor: Colors.orange,
             ),
           ),
         ),

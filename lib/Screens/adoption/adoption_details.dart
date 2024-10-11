@@ -15,6 +15,10 @@ class AdoptionPostDetails extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
+        title: const Text(
+          "Pet Details",
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -60,7 +64,7 @@ class AdoptionPostDetails extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.45,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Colors.orange[50],
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
@@ -109,7 +113,7 @@ class AdoptionPostDetails extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: Colors.orange[50],
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Row(

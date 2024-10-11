@@ -171,7 +171,7 @@ class _CompletedState extends State<Completed> {
                       Navigator.of(context).pop(); // Close the dialog
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFFFA6650),
+                      backgroundColor: Colors.orange,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -200,23 +200,19 @@ class _CompletedState extends State<Completed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 112.0,
+        centerTitle: true,
         title: const Text(
-          'Completed Vaccines',
+          'Vaccination History',
           style: TextStyle(
-              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
         ),
-        backgroundColor: const Color(0xFFFA6650),
+        backgroundColor: Colors.white,
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.red.shade100, Colors.white],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -255,7 +251,7 @@ class _CompletedState extends State<Completed> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Colors.orange[50],
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(

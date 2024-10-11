@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'pet_report_detail_screen.dart';
 import 'report_pet_screen.dart';
 
@@ -10,9 +12,40 @@ class NewsFeedScreen extends StatefulWidget {
   _NewsFeedScreenState createState() => _NewsFeedScreenState();
 }
 
-class _NewsFeedScreenState extends State<NewsFeedScreen> {
+class _NewsFeedScreenState extends State<NewsFeedScreen>
+    with SingleTickerProviderStateMixin {
   String filterType = 'all';
   final User? currentUser = FirebaseAuth.instance.currentUser;
+  late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        switch (_tabController.index) {
+          case 0:
+            filterType = 'all';
+            break;
+          case 1:
+            filterType = 'lost';
+            break;
+          case 2:
+            filterType = 'found';
+            break;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   Stream<QuerySnapshot> fetchReports() {
     CollectionReference reportsRef =
@@ -49,134 +82,267 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   void _showReportOptions() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.pets, color: Colors.red),
-                title: Text('Report Lost Pet'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReportPetScreen(reportType: 'lost'),
-                    ),
-                  );
-                },
+        return DraggableScrollableSheet(
+          initialChildSize: 0.25,
+          minChildSize: 0.2,
+          maxChildSize:
+              0.25, 
+          builder: (_, controller) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.white, Colors.grey[100]!], // Soft gradient
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    spreadRadius: 5,
+                  ),
+                ],
               ),
-              ListTile(
-                leading: Icon(Icons.pets, color: Colors.green),
-                title: Text('Report Found Pet'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ReportPetScreen(reportType: 'found'),
+              child: Column(
+                children: [
+                  // Handle with modern design
+                  GestureDetector(
+                    onTap: () {
+                      // Optionally make this tappable to expand or collapse the sheet
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 10),
+                      width: 50,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                     ),
-                  );
-                },
+                  ),
+                  SizedBox(height: 15), // Space between handle and content
+                  Expanded(
+                    child: ListView(
+                      controller: controller,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      children: [
+                        // Redesigned ListTile for 'Report Lost Pet'
+                        _buildCustomTile(
+                          icon: Icons.pets,
+                          iconColor: Colors.red,
+                          title: 'Report Lost Pet',
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ReportPetScreen(reportType: 'lost'),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 15), // Space between tiles
+                        // Redesigned ListTile for 'Report Found Pet'
+                        _buildCustomTile(
+                          icon: Icons.pets,
+                          iconColor: Colors.green,
+                          title: 'Report Found Pet',
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ReportPetScreen(reportType: 'found'),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
+    );
+  }
+
+  // Custom ListTile Builder Function
+  Widget _buildCustomTile({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required Function() onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Custom Icon with circular background
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
+            ),
+            SizedBox(width: 20),
+            // Title Text with modern style
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[20],
-      appBar: AppBar(
-        title: Text(
-          'News Feed',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.orangeAccent,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FilterChip(
-                  label: Text('All'),
-                  selected: filterType == 'all',
-                  onSelected: (selected) {
-                    setState(() => filterType = 'all');
-                  },
-                  backgroundColor: Colors.amber[100],
-                  selectedColor: Colors.orange[200],
+      backgroundColor: Colors.amber[50],
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.orangeAccent,
+              expandedHeight: 200.0,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text('News Feed',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      'images/login.png',
+                      fit: BoxFit.cover,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, Colors.black54],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                FilterChip(
-                  label: Text('Lost'),
-                  selected: filterType == 'lost',
-                  onSelected: (selected) {
-                    setState(() => filterType = 'lost');
-                  },
-                  backgroundColor: Colors.amber[100],
-                  selectedColor: Colors.orange[200],
-                ),
-                FilterChip(
-                  label: Text('Found'),
-                  selected: filterType == 'found',
-                  onSelected: (selected) {
-                    setState(() => filterType = 'found');
-                  },
-                  backgroundColor: Colors.amber[100],
-                  selectedColor: Colors.orange[200],
-                ),
-              ],
+              ),
             ),
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: fetchReports(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                      child: Text('Error loading reports: ${snapshot.error}'));
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+            SliverPersistentHeader(
+              delegate: _SliverAppBarDelegate(
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: Colors.orangeAccent,
+                  labelColor: Colors.black87,
+                  unselectedLabelColor: Colors.black54,
+                  tabs: [
+                    Tab(text: 'All'),
+                    Tab(text: 'Lost'),
+                    Tab(text: 'Found'),
+                  ],
+                ),
+              ),
+              pinned: true,
+            ),
+          ];
+        },
+        body: StreamBuilder<QuerySnapshot>(
+          stream: fetchReports(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                  child: Text('Error loading reports: ${snapshot.error}'));
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-                final reports = snapshot.data!.docs;
+            final reports = snapshot.data!.docs;
 
-                if (reports.isEmpty) {
-                  return Center(
-                      child:
-                          Text('No reports available for the selected filter'));
-                }
+            if (reports.isEmpty) {
+              return Center(
+                  child: Text('No reports available for the selected filter'));
+            }
 
-                return ListView.builder(
-                  itemCount: reports.length,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot doc = reports[index];
-                    return PetReportCard(doc: doc, onLike: toggleLike);
-                  },
-                );
+            return MasonryGridView.count(
+              crossAxisCount: 2,
+              itemCount: reports.length,
+              itemBuilder: (context, index) {
+                DocumentSnapshot doc = reports[index];
+                return PetReportCard(doc: doc, onLike: toggleLike);
               },
-            ),
-          ),
-        ],
+              mainAxisSpacing: 4.0,
+              crossAxisSpacing: 4.0,
+            );
+          },
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _showReportOptions,
-        child: Icon(Icons.add),
+        icon: Icon(Icons.add),
+        label: Text('Report'),
         backgroundColor: Colors.orangeAccent,
       ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.white,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }
 
@@ -206,8 +372,7 @@ class PetReportCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -221,31 +386,25 @@ class PetReportCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-              child: imageUrl.isNotEmpty
-                  ? Image.network(
-                      imageUrl,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 200,
-                          color: Colors.grey[300],
-                          child: Icon(Icons.error, color: Colors.red),
-                        );
-                      },
-                    )
-                  : Container(
-                      height: 200,
-                      width: double.infinity,
-                      color: Colors.grey[300],
-                      child:
-                          Icon(Icons.pets, size: 80, color: Colors.grey[500]),
-                    ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[300],
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.error),
+                  ),
+                ),
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -257,7 +416,7 @@ class PetReportCard extends StatelessWidget {
                           '$animalType - $breed',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 16,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -279,6 +438,7 @@ class PetReportCard extends StatelessWidget {
                                 ? Colors.red[700]
                                 : Colors.green[700],
                             fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -288,12 +448,13 @@ class PetReportCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.location_on,
-                          size: 16, color: Colors.amber[700]),
+                          size: 14, color: Colors.amber[700]),
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           location,
-                          style: TextStyle(color: Colors.grey[600]),
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -304,35 +465,38 @@ class PetReportCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.access_time,
-                          size: 16, color: Colors.amber[700]),
+                          size: 14, color: Colors.amber[700]),
                       SizedBox(width: 4),
-                      Text(timeAgo, style: TextStyle(color: Colors.grey[600])),
+                      Text(timeAgo,
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12)),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => onLike(doc),
-                            child: Icon(
+                      GestureDetector(
+                        onTap: () => onLike(doc),
+                        child: Row(
+                          children: [
+                            Icon(
                               isLiked ? Icons.favorite : Icons.favorite_border,
                               color: isLiked ? Colors.red : Colors.orange[300],
-                              size: 24,
+                              size: 20,
                             ),
-                          ),
-                          SizedBox(width: 4),
-                          Text('$likes'),
-                        ],
+                            SizedBox(width: 4),
+                            Text('$likes', style: TextStyle(fontSize: 12)),
+                          ],
+                        ),
                       ),
                       Row(
                         children: [
                           Icon(Icons.comment_outlined,
-                              color: Colors.orangeAccent, size: 20),
+                              color: Colors.orangeAccent, size: 18),
                           SizedBox(width: 4),
-                          Text('${comments.length}'),
+                          Text('${comments.length}',
+                              style: TextStyle(fontSize: 12)),
                         ],
                       ),
                     ],

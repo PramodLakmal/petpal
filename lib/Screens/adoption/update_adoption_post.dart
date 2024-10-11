@@ -105,8 +105,10 @@ class _UpdateAdoptionPostState extends State<UpdateAdoptionPost> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Adoption Post'),
-        backgroundColor: Colors.orangeAccent,
+        title: const Text('Update Adoption Post',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -139,12 +141,15 @@ class _UpdateAdoptionPostState extends State<UpdateAdoptionPost> {
                 child: ElevatedButton(
                   onPressed: _pickImage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
+                  backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Pick Image'),
+                  child: const Text('Pick Image',
+                  style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -195,12 +200,15 @@ class _UpdateAdoptionPostState extends State<UpdateAdoptionPost> {
               ElevatedButton(
                 onPressed: _updatePost,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
+                  backgroundColor: Colors.orange,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: const Text('Update Post'),
+                child: const Text('Update Post',
+                style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
               ),
             ],
           ),

@@ -95,16 +95,18 @@ class _UpcomingVaccinesState extends State<UpcomingVaccines> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 112.0,
+        centerTitle: true,
         title: const Text(
           'Upcoming Vaccine',
           style: TextStyle(
-              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
         ),
-        backgroundColor: Color(0xFFFA6650),
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -143,7 +145,7 @@ class _UpcomingVaccinesState extends State<UpcomingVaccines> {
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.pink[50],
+                              color: Colors.orange[50],
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
@@ -268,7 +270,7 @@ class _UpcomingVaccinesState extends State<UpcomingVaccines> {
                                     padding: const EdgeInsets.all(16.0),
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: Colors.orange,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),

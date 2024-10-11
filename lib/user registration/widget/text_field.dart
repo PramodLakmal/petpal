@@ -28,12 +28,12 @@ class TextFieldInput extends StatelessWidget {
               const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           border: InputBorder.none,
           filled: true,
-          fillColor: Color(0x33FA6650),
+          fillColor: Colors.orange[50],
           enabledBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: BorderRadius.circular(10)),
           focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(width: 1, color: Color(0xFFFA6650)),
+              borderSide: BorderSide(width: 1, color: Colors.orange[50]!),
               borderRadius: BorderRadius.circular(30)),
         ),
       ),

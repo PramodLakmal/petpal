@@ -127,7 +127,9 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pets For Adoption"),
+        title: const Text("Find Pets For Adoption",
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -146,7 +148,7 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: const Icon(Icons.mic),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: const Color.fromARGB(255, 255, 255, 255),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -188,7 +190,7 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
       margin: const EdgeInsets.symmetric(horizontal: .2, vertical: 8), // Reduced horizontal margin
       height: 150,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F0),
+        color: const Color.fromARGB(255, 255, 255, 255),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -283,17 +285,17 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                     child: ElevatedButton.icon(
                       onPressed: () => _navigateToDetails(postId),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 221, 119, 72), // Button background color
+                        backgroundColor: const Color.fromRGBO(255, 152, 0, 1), // Button background color
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10), // Rounded corners
                         ),
                         padding: const EdgeInsets.symmetric(
                             vertical: 8, horizontal: 16), // Smaller button size
                       ),
-                      icon: const Icon(Icons.pets, size: 18), // Smaller icon
+                      icon: const Icon(Icons.pets,color: Colors.white, size: 18), // Smaller icon
                       label: const Text(
                         'Adopt',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 14,color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),

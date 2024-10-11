@@ -282,21 +282,21 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               ),
 
               // Book Appointment Button
-              SizedBox(height: 24),
+              SizedBox(height: 24,),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _createAppointment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFFFA6650),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: Text(
                     'Book Appointment',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

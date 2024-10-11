@@ -176,17 +176,18 @@ class _PetProfileState extends State<PetProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 112.0,
-        backgroundColor: const Color(0xFFFA6650),
-        title: Center(
-            child: Text(
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
           "$name's Profile",
           style: TextStyle(
-              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
-        )),
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -252,7 +253,7 @@ class _PetProfileState extends State<PetProfile> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFFFA6650).withOpacity(0.8),
+                    const Color.fromARGB(255, 240, 254, 173).withOpacity(0.8),
                     Colors.pink[50]!
                   ],
                   begin: Alignment.topLeft,
@@ -328,7 +329,7 @@ class _PetProfileState extends State<PetProfile> {
                       const SizedBox(width: 20),
                       IconButton(
                         icon: const Icon(Icons.delete,
-                            color: Colors.red, size: 30),
+                            color: Colors.black87, size: 30),
                         onPressed: () => _showDeleteConfirmationDialog(context),
                         tooltip: 'Delete Pet',
                       ),
