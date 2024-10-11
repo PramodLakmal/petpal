@@ -12,7 +12,7 @@ class SearchAdoptionPostDetails extends StatelessWidget {
     final DocumentReference postRef = FirebaseFirestore.instance.collection('adoption').doc(postId);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -48,7 +48,7 @@ class SearchAdoptionPostDetails extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.45,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Colors.orange[50],
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
@@ -97,7 +97,7 @@ class SearchAdoptionPostDetails extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: Colors.orange[50],
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Row(
