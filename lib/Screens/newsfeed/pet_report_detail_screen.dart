@@ -103,7 +103,11 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
                           pinned: true,
                           flexibleSpace: FlexibleSpaceBar(
                             title: Text(
-                                '${reportData['animalType']} (${reportData['breed']})'),
+                              '${reportData['animalType']} (${reportData['breed']})',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
                             background: Image.network(
                               reportData['imageUrl'],
                               fit: BoxFit.cover,
@@ -206,7 +210,7 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.location_on, color: Colors.redAccent),
+                Icon(Icons.location_on, color: Colors.orangeAccent),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -219,7 +223,7 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
             SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.pets, color: Colors.brown),
+                Icon(Icons.pets, color: Colors.orangeAccent),
                 SizedBox(width: 8),
                 Text(
                   'Color: ${reportData['color']}',
@@ -241,7 +245,7 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
             SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.person, color: Colors.blueAccent),
+                Icon(Icons.person, color: Colors.orangeAccent),
                 SizedBox(width: 8),
                 Text(
                   'Reported by: ${reportData['name']}',
@@ -252,7 +256,7 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
             SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.phone, color: Colors.greenAccent),
+                Icon(Icons.phone, color: Colors.orangeAccent),
                 SizedBox(width: 8),
                 Text(
                   'Contact: ${reportData['contactNumber']}',
@@ -378,7 +382,7 @@ class _PetReportDetailScreenState extends State<PetReportDetailScreen> {
         var userData = snapshot.data!.data() as Map<String, dynamic>;
         String commenterName = userData['name'] ?? 'Anonymous';
         String commenterImageUrl = userData['profileImageUrl'] ??
-            'https://www.example.com/placeholder.jpg';
+            'https://cdn3.pixelcut.app/1/3/profile_picture_1728ecf2bd.jpg';
         bool isAuthor = comment['userId'] == reportUserId;
 
         String timeAgo = timeago.format(comment['timestamp'].toDate());
