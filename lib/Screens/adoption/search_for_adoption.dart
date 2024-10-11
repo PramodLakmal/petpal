@@ -127,7 +127,9 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pets For Adoption"),
+        title: const Text("Find Pets For Adoption",
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -146,7 +148,7 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: const Icon(Icons.mic),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: const Color.fromARGB(255, 255, 255, 255),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -290,10 +292,10 @@ class _SearchForAdoptionState extends State<SearchForAdoption> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 8, horizontal: 16), // Smaller button size
                       ),
-                      icon: const Icon(Icons.pets, size: 18), // Smaller icon
+                      icon: const Icon(Icons.pets,color: Colors.white, size: 18), // Smaller icon
                       label: const Text(
                         'Adopt',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 14,color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),

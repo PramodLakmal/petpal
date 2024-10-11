@@ -135,8 +135,10 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Adoption Post'),
-        backgroundColor: Colors.orangeAccent,
+        title: const Text('Create Adoption Post',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -163,7 +165,7 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                   child: _pickedImage == null
                       ? IconButton(
                           icon: const Icon(Icons.add_a_photo,
-                              color: Colors.orangeAccent),
+                              color: Colors.orange),
                           onPressed: _pickImage, // Handle add photo functionality
                         )
                       : null,
@@ -174,19 +176,22 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
                 child: ElevatedButton(
                   onPressed: _pickImage, // Pick image on button press
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
+                  backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Add Photo'),
+                  child: const Text('Add Photo',
+                  style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               const SizedBox(height: 30),
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  color: Colors.pink[50],
+                  color: Colors.orange[50],
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Column(
@@ -321,10 +326,12 @@ class _CreateAdoptionPostState extends State<CreateAdoptionPost> {
               ElevatedButton(
                 onPressed: _addAdoptionPost, // Trigger add adoption post function
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
+                  backgroundColor: Colors.orange,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                child: const Text('Create Adoption Post'),
+                child: const Text('Create Adoption Post',
+                style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),),
               ),
             ],
           ),

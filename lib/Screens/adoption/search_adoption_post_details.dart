@@ -16,6 +16,10 @@ class SearchAdoptionPostDetails extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
+        title: const Text(
+          "Pet Details",
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
