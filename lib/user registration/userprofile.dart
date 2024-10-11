@@ -519,8 +519,36 @@ Future<void> _editProfile() async {
                                 );
                               },
                             ),
-                            const Center(child: Text('Groups section')),
-                            const Center(child: Text('Events section')),
+                            ListView.builder(
+                              itemCount: mockGroups.length,
+                              itemBuilder: (context, index) {
+                                var group = mockGroups[index];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: group['imageUrl'] != null && group['imageUrl'].isNotEmpty
+                                        ? NetworkImage(group['imageUrl'])
+                                        : NetworkImage('https://via.placeholder.com/80'),
+                                  ),
+                                  title: Text(group['name']),
+                                  subtitle: Text(group['description']),
+                                  trailing: Text("${group['memberCount']} members"),
+                                );
+                              },
+                            ),
+                            // Events Tab (Dummy Data)
+                            ListView.builder(
+                              itemCount: mockEvents.length,
+                              itemBuilder: (context, index) {
+                                var event = mockEvents[index];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(event['imageUrl']),
+                                  ),
+                                  title: Text(event['title']),
+                                  subtitle: Text("${event['date']} • ${event['location']}"),
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -693,3 +721,48 @@ class PostWidget extends StatelessWidget {
     );
   }
 }
+
+// Dummy data for groups
+final List<Map<String, dynamic>> mockGroups = [
+  {
+    'name': "Dog's Life",
+    'description': 'Dog knowledge sharing and offline exchanges.',
+    'memberCount': 548,
+    'imageUrl': 'https://th.bing.com/th/id/R.3decdf9501c7b6896087e43f4bb2a123?rik=sFSNimtXCpzMow&riu=http%3a%2f%2f3.bp.blogspot.com%2f-bPjs5rvhy8Q%2fUUGIG79FDqI%2fAAAAAAAAAts%2fQWqMBzROZ44%2fs1600%2fGolden%2bRetriever%2bDog08.jpg&ehk=uSaIvM3ssgGZ99jnzSgHcwtdswBQjCSsGQVLgtjFJIA%3d&risl=&pid=ImgRaw&r=0', // Replace with actual asset path
+  },
+  {
+    'name': "Cat Lovers",
+    'description': 'A place for cat enthusiasts.',
+    'memberCount': 302,
+    'imageUrl': 'https://th.bing.com/th/id/OIP.CiwY4gqtOT4H1dpytV32SQAAAA?w=300&h=300&rs=1&pid=ImgDetMain', // Replace with actual asset path
+  },
+  {
+    'name': "Pet Owners",
+    'description': 'General tips and tricks for pet owners.',
+    'memberCount': 720,
+    'imageUrl': 'https://th.bing.com/th/id/R.422da64b5d4c9753d101857671960901?rik=APlxNPUViFhaBQ&pid=ImgRaw&r=0', // Replace with actual asset path
+  },
+];
+
+// Dummy data for events
+final List<Map<String, dynamic>> mockEvents = [
+  {
+    'title': "Dog Training Workshop",
+    'date': 'October 20, 2024',
+    'location': 'Central Park, NYC',
+    'imageUrl': 'https://i.pinimg.com/736x/54/db/a7/54dba7bfc7e3f3efdeb9e8f65e112485--air-force--uniform.jpg', // Replace with actual asset path
+  },
+  {
+    'title': "Pet Adoption Fair",
+    'date': 'November 5, 2024',
+    'location': 'Pet Plaza, LA',
+    'imageUrl': 'https://img.freepik.com/premium-photo/furry-friends-strike-pose-dogs-cats-capturing-pawsome-selfie-white-background_983420-23964.jpg?w=2000', // Replace with actual asset path
+  },
+  {
+    'title': "Annual Pet Expo",
+    'date': 'December 12, 2024',
+    'location': 'Expo Center, San Francisco',
+    'imageUrl': 'https://th.bing.com/th/id/OIP.E9yvXTMYr9WMMlyTe_muaQHaE7?w=626&h=417&rs=1&pid=ImgDetMain', // Replace with actual asset path
+  },
+];
+
