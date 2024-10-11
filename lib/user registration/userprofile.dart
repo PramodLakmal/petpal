@@ -437,8 +437,10 @@ Future<void> _editProfile() async {
                 // My pet section
                 Container(
                   padding: const EdgeInsets.all(16.0),
-                  width: double.infinity,
-                  color: Colors.grey[200],
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

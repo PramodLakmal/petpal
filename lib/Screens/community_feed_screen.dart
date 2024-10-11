@@ -338,121 +338,118 @@ class _PostCardState extends State<PostCard> {
         .add(comment);
   }
 
-@override
-Widget build(BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.all(0), // Slightly larger padding
-    child: Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0), // Rounded corners
-      ),
-      color: Colors.white, // Subtle background color
-      margin: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
-      child: Padding( // Add padding inside the card
-        padding: const EdgeInsets.all(12.0), 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              leading: CircleAvatar(
-                radius: 24.0, // Slightly larger avatar
-                backgroundImage: widget.userProfilePicture.isNotEmpty
-                    ? NetworkImage(widget.userProfilePicture)
-                    : NetworkImage('https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png') as ImageProvider,
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(0), // Slightly larger padding
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+        ),
+        color: Colors.white, // Subtle background color
+        margin: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+        child: Padding( // Add padding inside the card
+          padding: const EdgeInsets.all(12.0), 
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 24.0, // Slightly larger avatar
+                  backgroundImage: widget.userProfilePicture.isNotEmpty
+                      ? NetworkImage(widget.userProfilePicture)
+                      : NetworkImage('https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png') as ImageProvider,
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.userName,
+                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Golden Retriever • Fayetteville',
+                      style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(height: 8.0),
+              Text(widget.content, style: TextStyle(fontSize: 16.0)),
+              SizedBox(height: 8.0),
+              if (widget.images.isNotEmpty)
+                GridView.count(
+                  shrinkWrap: true, // Prevents expanding
+                  crossAxisCount: 1, // Display in 1 column
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  children: widget.images
+                      .map((imageUrl) => ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0), // Rounded image borders
+                          child: Image.network(imageUrl, fit: BoxFit.cover)))
+                      .toList(),
+                ),
+              SizedBox(height: 12.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.userName,
-                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  // Replace the existing IconButton for likes with FutureBuilder
+                  FutureBuilder<DocumentSnapshot>(
+                    future: _firestore
+                        .collection('posts')
+                        .doc(widget.postId)
+                        .collection('likes')
+                        .doc(_auth.currentUser?.uid)
+                        .get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator(color: Colors.orange);
+                      }
+
+                      if (!snapshot.hasData) {
+                        return Text('Error loading likes');
+                      }
+
+                      final isLiked = snapshot.data!.exists;
+
+                      return IconButton(
+                        icon: Icon(
+                          isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                          color: isLiked ? Colors.orange : Colors.grey,
+                        ),
+                        onPressed: toggleLike, // Your toggle function remains unchanged
+                      );
+                    },
                   ),
-                  Text(
-                    'Golden Retriever • Fayetteville',
-                    style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                  Text('${widget.likes} Likes', style: TextStyle(color: isLiked ? Colors.orange : Colors.black54)),
+                  SizedBox(width: 16.0),
+                  IconButton(
+                    icon: Icon(Icons.comment, color: Colors.grey),
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return CommentSection(postId: widget.postId);
+                          });
+                    },
                   ),
+                  Text('${widget.comments.length} Comments', style: TextStyle(color: Colors.black54)),
+                  IconButton(
+                    icon: Icon(Icons.share, color: Colors.grey),
+                    onPressed: () {
+                      // Handle share press
+                    },
+                  ),
+                  Text('Shares', style: TextStyle(color: Colors.black54)),
                 ],
+                  
               ),
-            ),
-            SizedBox(height: 8.0),
-            Text(widget.content, style: TextStyle(fontSize: 16.0)),
-            SizedBox(height: 8.0),
-            if (widget.images.isNotEmpty)
-              GridView.count(
-                shrinkWrap: true, // Prevents expanding
-                crossAxisCount: 1, // Display in 1 column
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-                children: widget.images
-                    .map((imageUrl) => ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0), // Rounded image borders
-                        child: Image.network(imageUrl, fit: BoxFit.cover)))
-                    .toList(),
-              ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // Replace the existing IconButton for likes with FutureBuilder
-                FutureBuilder<DocumentSnapshot>(
-                  future: _firestore
-                      .collection('posts')
-                      .doc(widget.postId)
-                      .collection('likes')
-                      .doc(_auth.currentUser?.uid)
-                      .get(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator(color: Colors.orange);
-                    }
-
-                    if (!snapshot.hasData) {
-                      return Text('Error loading likes');
-                    }
-
-                    final isLiked = snapshot.data!.exists;
-
-                    return IconButton(
-                      icon: Icon(
-                        isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                        color: isLiked ? Colors.orange : Colors.grey,
-                      ),
-                      onPressed: toggleLike, // Your toggle function remains unchanged
-                    );
-                  },
-                ),
-                Text('${widget.likes} Likes', style: TextStyle(color: isLiked ? Colors.orange : Colors.black54)),
-                SizedBox(width: 16.0),
-                IconButton(
-                  icon: Icon(Icons.comment, color: Colors.grey),
-                  onPressed: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return CommentSection(postId: widget.postId);
-                        });
-                  },
-                ),
-                Text('${widget.comments.length} Comments', style: TextStyle(color: Colors.black54)),
-                IconButton(
-                  icon: Icon(Icons.share, color: Colors.grey),
-                  onPressed: () {
-                    // Handle share press
-                  },
-                ),
-                Text('Shares', style: TextStyle(color: Colors.black54)),
-              ],
-                
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
-
-
+    );
+  }
 }
 
 class CommentSection extends StatefulWidget {
