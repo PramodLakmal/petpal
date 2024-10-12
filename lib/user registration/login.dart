@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:petpal/Password%20Forget/forgot_password.dart';
-import 'package:petpal/admin%20side/admin_dashboard.dart';
+
 import 'package:petpal/user%20registration/SignUp.dart';
 import 'package:petpal/user%20registration/homeScreen.dart';
 import 'package:petpal/user%20registration/services/authentication.dart';
 import 'package:petpal/user%20registration/services/google_auth.dart';
-import 'package:petpal/user%20registration/widget/button.dart';
 import 'package:petpal/user%20registration/widget/showSnackbar.dart';
 import 'package:petpal/user%20registration/widget/text_field.dart';
 
@@ -149,15 +148,22 @@ class _LoginState extends State<Login> {
                       side: const BorderSide(color: Colors.black45, width: 2),
                     ),
                     minimumSize: Size(250, 50),
-                  ),
-                  onPressed: () async {
-                    await FirebaseServices().signInWithGoogle();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
-                    );
-                  },
+                  ),onPressed: () async {
+  String? result = await FirebaseServices().signInWithGoogle(context);
+  
+  if (result == null) {
+    // If the result is null, sign-in was successful
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+  } else {
+    // Show error message
+    showSnackBar(context, result);
+  }
+},
+
+                
                   child: Row(
                     children: [
                       Padding(
@@ -165,6 +171,9 @@ class _LoginState extends State<Login> {
                         child: Image.network(
                           "https://image.similarpng.com/very-thumbnail/2020/06/Logo-google-icon-PNG.png",
                           height: 35,
+                           errorBuilder: (context, error, stackTrace) {
+    return Icon(Icons.error); // Show an error icon if loading fails
+  },
                         ),
                       ),
                       const Text(

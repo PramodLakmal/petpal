@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petpal/Screens/edit_profile_screen.dart';
+import 'package:petpal/user%20registration/services/google_auth.dart';
 import 'dart:io';
 import '../Screens/newsfeed/news_feed_screen.dart';
 import 'package:petpal/user%20registration/login.dart';
@@ -38,17 +39,17 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Stream<QuerySnapshot> _getUserPets() {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    // User is not logged in, return an empty stream or handle the case properly
-    return const Stream.empty();
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // User is not logged in, return an empty stream or handle the case properly
+      return const Stream.empty();
+    }
+
+    return FirebaseFirestore.instance
+        .collection('pets')
+        .where('userId', isEqualTo: user.uid)
+        .snapshots();
   }
-  
-  return FirebaseFirestore.instance
-      .collection('pets')
-      .where('userId', isEqualTo: user.uid)
-      .snapshots();
-}
 
   // Upload profile photo
   Future<void> _uploadProfilePhoto() async {
@@ -115,12 +116,12 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   // Function to edit profile
-Future<void> _editProfile() async {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => EditProfileScreen()),
-  );
-}
+  Future<void> _editProfile() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditProfileScreen()),
+    );
+  }
 
   // Function to delete profile
   Future<void> _deleteProfile() async {
@@ -149,6 +150,7 @@ Future<void> _editProfile() async {
 
   // Logout function
   Future<void> _logout() async {
+    await FirebaseServices().googleSignOut();
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
       context,
@@ -191,7 +193,10 @@ Future<void> _editProfile() async {
         future: _getUserDetails(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.orange,));
+            return const Center(
+                child: CircularProgressIndicator(
+              color: Colors.orange,
+            ));
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
@@ -382,7 +387,7 @@ Future<void> _editProfile() async {
                 ),
 
                 const SizedBox(height: 20),
-                  //premium membership section
+                //premium membership section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: GestureDetector(
@@ -399,8 +404,7 @@ Future<void> _editProfile() async {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      color: Colors
-                          .orangeAccent, 
+                      color: Colors.orangeAccent,
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Row(
@@ -444,13 +448,15 @@ Future<void> _editProfile() async {
                     children: [
                       const Text(
                         'My pet',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       StreamBuilder<QuerySnapshot>(
                         stream: _getUserPets(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return const CircularProgressIndicator(color: Colors.orange);
+                            return const CircularProgressIndicator(
+                                color: Colors.orange);
                           }
 
                           var pets = snapshot.data!.docs;
@@ -464,16 +470,19 @@ Future<void> _editProfile() async {
                             shrinkWrap: true,
                             itemCount: pets.length,
                             itemBuilder: (context, index) {
-                              var pet = pets[index].data() as Map<String, dynamic>;
+                              var pet =
+                                  pets[index].data() as Map<String, dynamic>;
                               print("Pet details: $pet"); // Debugging line
-                              
+
                               // Decode the base64 image string if available
                               Uint8List? imageBytes;
-                              if (pet['imageBase64'] != null && pet['imageBase64'].isNotEmpty) {
+                              if (pet['imageBase64'] != null &&
+                                  pet['imageBase64'].isNotEmpty) {
                                 try {
                                   imageBytes = base64Decode(pet['imageBase64']);
                                 } catch (e) {
-                                  print("Error decoding image for pet ${pet['name']}: $e");
+                                  print(
+                                      "Error decoding image for pet ${pet['name']}: $e");
                                 }
                               }
 
@@ -481,8 +490,10 @@ Future<void> _editProfile() async {
                                 leading: CircleAvatar(
                                   backgroundColor: Colors.grey[300],
                                   backgroundImage: imageBytes != null
-                                      ? MemoryImage(imageBytes)  // Use MemoryImage for base64 image
-                                      : NetworkImage('https://via.placeholder.com/80'), // Fallback image
+                                      ? MemoryImage(
+                                          imageBytes) // Use MemoryImage for base64 image
+                                      : NetworkImage(
+                                          'https://via.placeholder.com/80'), // Fallback image
                                 ),
                                 title: Text(pet['name']),
                                 subtitle: Text(pet['breed']),
@@ -517,7 +528,9 @@ Future<void> _editProfile() async {
                               stream: _getUserPosts(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
-                                  return const CircularProgressIndicator(color: Colors.orange,);
+                                  return const CircularProgressIndicator(
+                                    color: Colors.orange,
+                                  );
                                 }
 
                                 var posts = snapshot.data!.docs;
@@ -544,13 +557,17 @@ Future<void> _editProfile() async {
                                 var group = mockGroups[index];
                                 return ListTile(
                                   leading: CircleAvatar(
-                                    backgroundImage: group['imageUrl'] != null && group['imageUrl'].isNotEmpty
+                                    backgroundImage: group['imageUrl'] !=
+                                                null &&
+                                            group['imageUrl'].isNotEmpty
                                         ? NetworkImage(group['imageUrl'])
-                                        : NetworkImage('https://via.placeholder.com/80'),
+                                        : NetworkImage(
+                                            'https://via.placeholder.com/80'),
                                   ),
                                   title: Text(group['name']),
                                   subtitle: Text(group['description']),
-                                  trailing: Text("${group['memberCount']} members"),
+                                  trailing:
+                                      Text("${group['memberCount']} members"),
                                 );
                               },
                             ),
@@ -561,10 +578,12 @@ Future<void> _editProfile() async {
                                 var event = mockEvents[index];
                                 return ListTile(
                                   leading: CircleAvatar(
-                                    backgroundImage: NetworkImage(event['imageUrl']),
+                                    backgroundImage:
+                                        NetworkImage(event['imageUrl']),
                                   ),
                                   title: Text(event['title']),
-                                  subtitle: Text("${event['date']} • ${event['location']}"),
+                                  subtitle: Text(
+                                      "${event['date']} • ${event['location']}"),
                                 );
                               },
                             ),
@@ -648,7 +667,9 @@ class PostWidget extends StatelessWidget {
                 backgroundImage: postData['userProfilePicture'] != null &&
                         postData['userProfilePicture'].isNotEmpty
                     ? NetworkImage(postData['userProfilePicture'])
-                    : NetworkImage('https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png') as ImageProvider,
+                    : NetworkImage(
+                            'https://www.citypng.com/public/uploads/preview/download-profile-user-round-orange-icon-symbol-png-11639594360ksf6tlhukf.png')
+                        as ImageProvider,
               ),
               title: Text(
                 postData['username'] ?? 'Unknown',
@@ -664,12 +685,11 @@ class PostWidget extends StatelessWidget {
                 ],
               ),
               trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.orange),
-              onPressed: () => _deletePost(context), // Pass context to _deletePost correctly
-              tooltip: 'Delete Post',
-            ),
-
-              
+                icon: const Icon(Icons.delete, color: Colors.orange),
+                onPressed: () => _deletePost(
+                    context), // Pass context to _deletePost correctly
+                tooltip: 'Delete Post',
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -747,19 +767,22 @@ final List<Map<String, dynamic>> mockGroups = [
     'name': "Dog's Life",
     'description': 'Dog knowledge sharing and offline exchanges.',
     'memberCount': 548,
-    'imageUrl': 'https://th.bing.com/th/id/R.3decdf9501c7b6896087e43f4bb2a123?rik=sFSNimtXCpzMow&riu=http%3a%2f%2f3.bp.blogspot.com%2f-bPjs5rvhy8Q%2fUUGIG79FDqI%2fAAAAAAAAAts%2fQWqMBzROZ44%2fs1600%2fGolden%2bRetriever%2bDog08.jpg&ehk=uSaIvM3ssgGZ99jnzSgHcwtdswBQjCSsGQVLgtjFJIA%3d&risl=&pid=ImgRaw&r=0', // Replace with actual asset path
+    'imageUrl':
+        'https://th.bing.com/th/id/R.3decdf9501c7b6896087e43f4bb2a123?rik=sFSNimtXCpzMow&riu=http%3a%2f%2f3.bp.blogspot.com%2f-bPjs5rvhy8Q%2fUUGIG79FDqI%2fAAAAAAAAAts%2fQWqMBzROZ44%2fs1600%2fGolden%2bRetriever%2bDog08.jpg&ehk=uSaIvM3ssgGZ99jnzSgHcwtdswBQjCSsGQVLgtjFJIA%3d&risl=&pid=ImgRaw&r=0', // Replace with actual asset path
   },
   {
     'name': "Cat Lovers",
     'description': 'A place for cat enthusiasts.',
     'memberCount': 302,
-    'imageUrl': 'https://th.bing.com/th/id/OIP.CiwY4gqtOT4H1dpytV32SQAAAA?w=300&h=300&rs=1&pid=ImgDetMain', // Replace with actual asset path
+    'imageUrl':
+        'https://th.bing.com/th/id/OIP.CiwY4gqtOT4H1dpytV32SQAAAA?w=300&h=300&rs=1&pid=ImgDetMain', // Replace with actual asset path
   },
   {
     'name': "Pet Owners",
     'description': 'General tips and tricks for pet owners.',
     'memberCount': 720,
-    'imageUrl': 'https://th.bing.com/th/id/R.422da64b5d4c9753d101857671960901?rik=APlxNPUViFhaBQ&pid=ImgRaw&r=0', // Replace with actual asset path
+    'imageUrl':
+        'https://th.bing.com/th/id/R.422da64b5d4c9753d101857671960901?rik=APlxNPUViFhaBQ&pid=ImgRaw&r=0', // Replace with actual asset path
   },
 ];
 
@@ -769,19 +792,21 @@ final List<Map<String, dynamic>> mockEvents = [
     'title': "Dog Training Workshop",
     'date': 'October 20, 2024',
     'location': 'Central Park, NYC',
-    'imageUrl': 'https://i.pinimg.com/736x/54/db/a7/54dba7bfc7e3f3efdeb9e8f65e112485--air-force--uniform.jpg', // Replace with actual asset path
+    'imageUrl':
+        'https://i.pinimg.com/736x/54/db/a7/54dba7bfc7e3f3efdeb9e8f65e112485--air-force--uniform.jpg', // Replace with actual asset path
   },
   {
     'title': "Pet Adoption Fair",
     'date': 'November 5, 2024',
     'location': 'Pet Plaza, LA',
-    'imageUrl': 'https://img.freepik.com/premium-photo/furry-friends-strike-pose-dogs-cats-capturing-pawsome-selfie-white-background_983420-23964.jpg?w=2000', // Replace with actual asset path
+    'imageUrl':
+        'https://img.freepik.com/premium-photo/furry-friends-strike-pose-dogs-cats-capturing-pawsome-selfie-white-background_983420-23964.jpg?w=2000', // Replace with actual asset path
   },
   {
     'title': "Annual Pet Expo",
     'date': 'December 12, 2024',
     'location': 'Expo Center, San Francisco',
-    'imageUrl': 'https://th.bing.com/th/id/OIP.E9yvXTMYr9WMMlyTe_muaQHaE7?w=626&h=417&rs=1&pid=ImgDetMain', // Replace with actual asset path
+    'imageUrl':
+        'https://th.bing.com/th/id/OIP.E9yvXTMYr9WMMlyTe_muaQHaE7?w=626&h=417&rs=1&pid=ImgDetMain', // Replace with actual asset path
   },
 ];
-
