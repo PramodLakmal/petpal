@@ -41,7 +41,6 @@ class PaymentScreen extends StatelessWidget {
                   onSuccess();
                   Navigator.pop(context);
                 },
-                child: Text('Confirm Payment', style: TextStyle(fontSize: 18)),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.amber[800],
@@ -49,6 +48,7 @@ class PaymentScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                child: Text('Confirm Payment', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
             ],
           ),

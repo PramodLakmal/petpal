@@ -440,7 +440,7 @@ Widget build(BuildContext context) {
                     // Handle share press
                   },
                 ),
-                Text('Shares', style: TextStyle(color: Colors.black54)),
+                Text('Share', style: TextStyle(color: Colors.black54)),
               ],
                 
             ),

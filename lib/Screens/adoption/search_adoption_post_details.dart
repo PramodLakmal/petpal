@@ -12,19 +12,6 @@ class SearchAdoptionPostDetails extends StatelessWidget {
     final DocumentReference postRef = FirebaseFirestore.instance.collection('adoption').doc(postId);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Pet Details",
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: FutureBuilder<DocumentSnapshot>(
         future: postRef.get(),
         builder: (context, snapshot) {
@@ -40,28 +27,33 @@ class SearchAdoptionPostDetails extends StatelessWidget {
 
           final post = snapshot.data!.data() as Map<String, dynamic>;
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.45,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: post['imageBase64'] != null
-                    ? Image.memory(
-                        base64Decode(post['imageBase64']),
-                        fit: BoxFit.contain,
-                      )
-                    : const Icon(Icons.pets, size: 120, color: Colors.grey),
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: MediaQuery.of(context).size.height * 0.5,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: post['imageBase64'] != null
+                      ? Image.memory(
+                          base64Decode(post['imageBase64']),
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.pets, size: 120, color: Colors.grey),
+                        ),
                 ),
-                Padding(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                title: const Text(
+                  "Pet Details",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,18 +61,28 @@ class SearchAdoptionPostDetails extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            post['name'] ?? 'Unnamed Pet',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              post['name'] ?? 'Unnamed Pet',
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          Text(
-                            '${post['age'] ?? 'N/A'} years',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.orange[100],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${post['age'] ?? 'N/A'} years',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange[800],
+                              ),
                             ),
                           ),
                         ],
@@ -94,19 +96,12 @@ class SearchAdoptionPostDetails extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Container(
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          color: Colors.orange[50],
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildInfoColumn('Weight', '${post['weight'] ?? 'N/A'} kg'),
-                            _buildInfoColumn('Gender', post['gender'] ?? 'N/A'),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          Expanded(child: _buildInfoCard('Weight', '${post['weight'] ?? 'N/A'} kg')),
+                          const SizedBox(width: 10),
+                          Expanded(child: _buildInfoCard('Gender', post['gender'] ?? 'N/A')),
+                        ],
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -128,33 +123,41 @@ class SearchAdoptionPostDetails extends StatelessWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
     );
   }
 
-  Widget _buildInfoColumn(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+  Widget _buildInfoCard(String label, String value) {
+    return Card(
+      color: Colors.orange[100],
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: const Color.fromARGB(255, 0, 0, 0),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 5),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
