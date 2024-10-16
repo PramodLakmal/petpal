@@ -7,10 +7,10 @@ Pet Pal is a mobile app designed to help pet owners manage their pets' health an
 
 Key Features:<br>
 
-Pet profile management and vaccine reminders.<br>
-Doctor booking and real-time chat with veterinarians.<br>
-Pet adoption platform with filters for species, breed, and location.<br>
-Community engagement with social sharing and pet-related events.<br>
+-Pet profile management and vaccine reminders.<br>
+-Doctor booking and real-time chat with veterinarians.<br>
+-Pet adoption platform with filters for species, breed, and location.<br>
+-Community engagement with social sharing and pet-related events.<br>
 
 <br><h3>Application's UI Screenshots</h3><br>
 
