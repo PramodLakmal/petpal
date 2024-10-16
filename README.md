@@ -12,6 +12,18 @@ Doctor booking and real-time chat with veterinarians.<br>
 Pet adoption platform with filters for species, breed, and location.<br>
 Community engagement with social sharing and pet-related events.<br>
 
+<br><h3>Application's UI Screenshots</h3><br>
+
+<p><img src="PetPal Screenshots/Home.png" width="300"/>&ensp; &ensp;
+<img src="PetPal Screenshots/Login.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Sign up.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Browse for available Pets.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Browse for available Doctor.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Group 273.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Community Feed.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Messages.png" width="300" />&ensp; &ensp;
+<img src="PetPal Screenshots/Marketing Poster for PetPal.png" width="300" /></p>
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
